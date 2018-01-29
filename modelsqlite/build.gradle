@@ -17,8 +17,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    lintOptions{
+        abortOnError false
+    }
 }
+
+task makeJar(type: Copy) {
+    delete 'build/libs/ModleSQLite.jar'
+    from('build/intermediates/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', 'ModleSQLite.jar')
+}
+
+makeJar.dependsOn(build)//gradlew makeJar
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

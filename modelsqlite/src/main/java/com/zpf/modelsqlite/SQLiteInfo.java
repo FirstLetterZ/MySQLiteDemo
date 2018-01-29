@@ -1,8 +1,7 @@
 package com.zpf.modelsqlite;
 
+import android.support.annotation.NonNull;
 import android.util.SparseIntArray;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class SQLiteInfo {
     private boolean asc;
     private String otherCondition;
 
-    public SQLiteInfo(@NotNull String tableName) {
+    public SQLiteInfo(@NonNull String tableName) {
         this.tableName = tableName;
     }
 

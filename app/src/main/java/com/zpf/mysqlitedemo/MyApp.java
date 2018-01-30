@@ -35,12 +35,12 @@ public class MyApp extends Application {
             }
 
             @Override
-            public String toString(Object object) {
+            public String toJson(Object object) {
                 return gson.toJson(object);
             }
 
             @Override
-            public Object toObject(String json, Class<?> cls) {
+            public Object fromJson(String json, Class<?> cls) {
                 return gson.fromJson(json,cls);
             }
         });

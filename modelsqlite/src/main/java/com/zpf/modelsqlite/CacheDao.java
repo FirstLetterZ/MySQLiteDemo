@@ -74,9 +74,9 @@ public class CacheDao {
 
         String getDataBaseFolderPath();//数据库文件位置,可以为null
 
-        String toString(Object object);//将数据转成json格式的字符串，具体实现方式由使用者决定
+        String toJson(Object object);//将数据转成json格式的字符串，具体实现方式由使用者决定
 
-        Object toObject(String json, Class<?> cls);//将json格式转化成对应的对象，具体实现方式由使用者决定
+        Object fromJson(String json, Class<?> cls);//将json格式转化成对应的对象，具体实现方式由使用者决定
     }
 
     public void setTAG(String TAG) {
@@ -308,7 +308,7 @@ public class CacheDao {
                     if (value != null && (value instanceof String)
                             && !TextUtils.equals(field.getType().getName(), String.class.getName())) {
                         if (mInfo != null) {
-                            Object newValue = mInfo.toObject(value.toString(), field.getType());
+                            Object newValue = mInfo.fromJson(value.toString(), field.getType());
                             field.set(receiver, newValue);
                         }
                     } else {
@@ -503,7 +503,7 @@ public class CacheDao {
                 result = (String) value;
             } else {
                 if (mInfo != null) {
-                    result = mInfo.toString(value);
+                    result = mInfo.toJson(value);
                 }
                 if (result == null) {
                     result = value.toString();

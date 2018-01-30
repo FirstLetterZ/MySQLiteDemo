@@ -25,6 +25,6 @@ import java.lang.annotation.Target;
         ColumnEnum.COLUMN_FLOAT_004, ColumnEnum.COLUMN_FLOAT_005,
         ColumnEnum.COLUMN_DOUBLE_001, ColumnEnum.COLUMN_DOUBLE_002, ColumnEnum.COLUMN_DOUBLE_003,
         ColumnEnum.COLUMN_SHORT_001, ColumnEnum.COLUMN_SHORT_002, ColumnEnum.COLUMN_SHORT_003})
-@Target({ElementType.METHOD, ElementType.FIELD,ElementType.LOCAL_VARIABLE})
-@interface ColumnLimit {
+@Target({ElementType.METHOD,ElementType.LOCAL_VARIABLE,ElementType.PARAMETER})
+public @interface ColumnLimit {
 }

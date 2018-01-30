@@ -59,17 +59,17 @@ public class SQLiteInfo {
         return this;
     }
 
-    public SQLiteInfo addQueryCondition(@ColumnEnum int columnName, String columnValue) {
+    public SQLiteInfo addQueryCondition(@ColumnLimit int columnName, String columnValue) {
         this.queryInfoList.add(new ColumnInfo(columnName, SQLiteConfig.RELATION_EQUALITY, columnValue));
         return this;
     }
 
-    public SQLiteInfo addQueryCondition(@ColumnEnum int columnName, String relation, String columnValue) {
+    public SQLiteInfo addQueryCondition(@ColumnLimit int columnName, String relation, String columnValue) {
         this.queryInfoList.add(new ColumnInfo(columnName, relation, columnValue));
         return this;
     }
 
-    public SQLiteInfo addOrderInfo(@ColumnEnum int columnName) {
+    public SQLiteInfo addOrderInfo(@ColumnLimit int columnName) {
         this.orderColumnList.put(columnName, columnName);
         return this;
     }

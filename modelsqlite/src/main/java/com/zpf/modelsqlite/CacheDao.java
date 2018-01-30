@@ -220,7 +220,6 @@ public class CacheDao {
     /**
      * 保存多条
      */
-
     public void saveByArray(@NonNull HashMap<Object, SQLiteInfo> valueArray) {
         if (valueArray.size() > 0) {
             mSQLiteDatabase.beginTransaction();

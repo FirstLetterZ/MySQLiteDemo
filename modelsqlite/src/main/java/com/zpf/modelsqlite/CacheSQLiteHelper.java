@@ -5,8 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Field;
-
 /**
  * 数据库构建
  * Created by ZPF on 2018/1/29.
@@ -34,16 +32,12 @@ public class CacheSQLiteHelper extends SQLiteOpenHelper {
                 .append("(_id integer primary key autoincrement,")
                 .append(SQLiteConfig.FIRST_KEY_WORD)
                 .append(" text");
-        Field[] columnFields = ColumnEnum.class.getFields();
-        for (Field columnField : columnFields) {
-            try {
-                int column = columnField.getInt(null);
-                String str = getColumnType(column);
-                if (str != null) {
-                    builder.append(",").append(SQLiteConfig.COLUMN_NAME).append(column).append(str);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+        ColumnEnum[] columnEnums = ColumnEnum.values();
+        for (ColumnEnum columnEnum : columnEnums) {
+            int column = columnEnum.getValue();
+            String str = getColumnType(column);
+            if (str != null) {
+                builder.append(",").append(SQLiteConfig.COLUMN_NAME).append(column).append(str);
             }
         }
         builder.append(")");

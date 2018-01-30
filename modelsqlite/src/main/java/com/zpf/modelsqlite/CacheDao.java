@@ -3,7 +3,9 @@ package com.zpf.modelsqlite;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -189,8 +191,27 @@ public class CacheDao {
      */
     public boolean updateColumn(ColumnInfo columnValue, ColumnInfo columnWhere) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(SQLiteConfig.COLUMN_NAME + columnValue.getColumnName().getValue(),
-                toString(columnValue.getColumnValue()));
+        String columnName = SQLiteConfig.COLUMN_NAME + columnValue.getColumnName().getValue();
+        Object data = columnValue.getColumnValue();
+        if (data == null) {
+            contentValues.put(columnName, "");
+        } else if (data instanceof Boolean) {
+            contentValues.put(columnName, (Boolean) data ? 1 : 0);
+        } else if (data instanceof Integer) {
+            contentValues.put(columnName, (Integer) data);
+        } else if (data instanceof Float) {
+            contentValues.put(columnName, (Float) data);
+        } else if (data instanceof Short) {
+            contentValues.put(columnName, (Short) data);
+        } else if (data instanceof Long) {
+            contentValues.put(columnName, (Long) data);
+        } else if (data instanceof Double) {
+            contentValues.put(columnName, (Double) data);
+        } else if (data instanceof String) {
+            contentValues.put(columnName, (String) data);
+        } else {
+            contentValues.put(columnName, toString(data));
+        }
         String where = SQLiteConfig.COLUMN_NAME + columnWhere.getColumnName().getValue() + columnWhere.getRelation()
                 + toString(columnWhere.getColumnValue());
         return mSQLiteDatabase.update(SQLiteConfig.TB_CACHE, contentValues, where, null) > 0;
@@ -199,6 +220,7 @@ public class CacheDao {
     /**
      * 保存多条
      */
+
     public void saveByArray(@NonNull HashMap<Object, SQLiteInfo> valueArray) {
         if (valueArray.size() > 0) {
             mSQLiteDatabase.beginTransaction();

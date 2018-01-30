@@ -1,7 +1,7 @@
 package com.zpf.modelsqlite;
 
 import android.support.annotation.NonNull;
-import android.util.SparseIntArray;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * Created by ZPF on 2018/1/24.
  */
 public class SQLiteInfo {
-    private SparseIntArray orderColumnList = new SparseIntArray();
+    private SparseArray<ColumnEnum> orderColumnList = new SparseArray<>();
     private List<ColumnInfo> queryInfoList = new ArrayList<>();
     private List<ColumnInfo> changeValueList = new ArrayList<>();
     private String tableName;
@@ -22,7 +22,7 @@ public class SQLiteInfo {
         this.tableName = tableName;
     }
 
-    SparseIntArray getOrderColumnList() {
+    SparseArray<ColumnEnum> getOrderColumnList() {
         return orderColumnList;
     }
 
@@ -59,18 +59,18 @@ public class SQLiteInfo {
         return this;
     }
 
-    public SQLiteInfo addQueryCondition(@ColumnLimit int columnName, String columnValue) {
+    public SQLiteInfo addQueryCondition(ColumnEnum columnName, String columnValue) {
         this.queryInfoList.add(new ColumnInfo(columnName, SQLiteConfig.RELATION_EQUALITY, columnValue));
         return this;
     }
 
-    public SQLiteInfo addQueryCondition(@ColumnLimit int columnName, String relation, String columnValue) {
+    public SQLiteInfo addQueryCondition(ColumnEnum columnName, String relation, String columnValue) {
         this.queryInfoList.add(new ColumnInfo(columnName, relation, columnValue));
         return this;
     }
 
-    public SQLiteInfo addOrderInfo(@ColumnLimit int columnName) {
-        this.orderColumnList.put(columnName, columnName);
+    public SQLiteInfo addOrderInfo(ColumnEnum columnName) {
+        this.orderColumnList.put(columnName.getValue(), columnName);
         return this;
     }
 

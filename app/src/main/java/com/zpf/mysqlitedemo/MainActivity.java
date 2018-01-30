@@ -1,7 +1,6 @@
 package com.zpf.mysqlitedemo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;

@@ -149,7 +149,8 @@ public class CacheDao {
             if (i > 0) {
                 sql.append(",");
             }
-            sql.append(SQLiteConfig.COLUMN_NAME).append(info.getChangeValueList().get(i).getColumnName()).append(SQLiteConfig.RELATION_EQUALITY);
+            sql.append(SQLiteConfig.COLUMN_NAME).append(info.getChangeValueList().get(i).getColumnName().getValue())
+                    .append(SQLiteConfig.RELATION_EQUALITY);
             bindArgs[i] = toString(info.getChangeValueList().get(i).getColumnValue());
         }
         sql.append(WHERE);
@@ -172,7 +173,7 @@ public class CacheDao {
         Object[] bindArgs = new Object[valuesSize + 1];
         bindArgs[0] = info.getTableName();
         for (int i = 0; i < valuesSize; i++) {
-            sql.append(",").append(SQLiteConfig.COLUMN_NAME).append(info.getChangeValueList().get(i).getColumnName());
+            sql.append(",").append(SQLiteConfig.COLUMN_NAME).append(info.getChangeValueList().get(i).getColumnName().getValue());
             bindArgs[i + 1] = toString(info.getChangeValueList().get(i).getColumnValue());
         }
         sql.append(") VALUES (");
@@ -301,7 +302,7 @@ public class CacheDao {
         for (Field field : fields) {
             SQLiteColumn note = field.getAnnotation(SQLiteColumn.class);
             if (note != null) {
-                int column = note.column();
+                int column = note.column().getValue();
                 try {
                     field.setAccessible(true);
                     Object value = getValueByCursor(cursor, column);
@@ -380,7 +381,7 @@ public class CacheDao {
             if (checkRelation(info.getQueryInfoList().get(i).getRelation())) {
                 builder.append(" AND ")
                         .append(SQLiteConfig.COLUMN_NAME)
-                        .append(info.getQueryInfoList().get(i).getColumnName())
+                        .append(info.getQueryInfoList().get(i).getColumnName().getValue())
                         .append(info.getQueryInfoList().get(i).getRelation());
                 whereArg[index + 1 + i] = toString(info.getQueryInfoList().get(i).getColumnValue());
             }
@@ -396,7 +397,7 @@ public class CacheDao {
             builder.append(SQLiteConfig.ORDER);
             for (int i = 0; i < info.getOrderColumnList().size(); i++) {
                 builder.append(SQLiteConfig.COLUMN_NAME)
-                        .append(info.getOrderColumnList().valueAt(i));
+                        .append(info.getOrderColumnList().valueAt(i).getValue());
                 if (i < info.getOrderColumnList().size() - 1) {
                     builder.append(",");
                 }

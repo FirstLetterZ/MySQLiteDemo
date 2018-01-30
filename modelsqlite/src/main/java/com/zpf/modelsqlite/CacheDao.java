@@ -1,5 +1,6 @@
 package com.zpf.modelsqlite;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -136,7 +137,7 @@ public class CacheDao {
     /**
      * 单条更新
      */
-    public void updateValue(SQLiteInfo info) {
+    private void updateValue(SQLiteInfo info) {
         int valuesSize = info.getChangeValueList().size();
         if (valuesSize == 0) {
             return;
@@ -158,11 +159,10 @@ public class CacheDao {
         mSQLiteDatabase.execSQL(sql.toString(), bindArgs);
     }
 
-
     /**
      * 单条插入
      */
-    public void insertValue(SQLiteInfo info) {
+    private void insertValue(SQLiteInfo info) {
         int valuesSize = info.getChangeValueList().size();
         if (valuesSize == 0) {
             return;
@@ -182,6 +182,18 @@ public class CacheDao {
         }
         sql.append(')');
         mSQLiteDatabase.execSQL(sql.toString(), bindArgs);
+    }
+
+    /**
+     * 更新单列数据
+     */
+    public boolean updateColumn(ColumnInfo columnValue, ColumnInfo columnWhere) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(SQLiteConfig.COLUMN_NAME + columnValue.getColumnName().getValue(),
+                toString(columnValue.getColumnValue()));
+        String where = SQLiteConfig.COLUMN_NAME + columnWhere.getColumnName().getValue() + columnWhere.getRelation()
+                + toString(columnWhere.getColumnValue());
+        return mSQLiteDatabase.update(SQLiteConfig.TB_CACHE, contentValues, where, null) > 0;
     }
 
     /**

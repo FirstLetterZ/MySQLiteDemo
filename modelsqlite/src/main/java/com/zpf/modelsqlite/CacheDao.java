@@ -3,9 +3,7 @@ package com.zpf.modelsqlite;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -28,7 +26,7 @@ public class CacheDao {
     private final String SQL_INSERT = "INSERT INTO " + SQLiteConfig.TB_CACHE + "(";
     private final String SQL_DELETE = "DELETE FROM " + SQLiteConfig.TB_CACHE + WHERE;
     private SQLiteDatabase mSQLiteDatabase;
-    private String TAG = "sqlite error";
+    private String TAG = "ModelSQLite";
     private static volatile CacheDao mDao;
     private static CacheInfo mInfo;
 

@@ -210,9 +210,8 @@ public class CacheDao {
         } else {
             contentValues.put(columnName, toString(data));
         }
-        String where = SQLiteConfig.COLUMN_NAME + columnWhere.getColumnName().getValue() + columnWhere.getRelation()
-                + toString(columnWhere.getColumnValue());
-        return mSQLiteDatabase.update(SQLiteConfig.TB_CACHE, contentValues, where, null) > 0;
+        String where = SQLiteConfig.COLUMN_NAME + columnWhere.getColumnName().getValue() + columnWhere.getRelation();
+        return mSQLiteDatabase.update(SQLiteConfig.TB_CACHE, contentValues, where, new String[]{toString(columnWhere.getColumnValue())}) > 0;
     }
 
     /**

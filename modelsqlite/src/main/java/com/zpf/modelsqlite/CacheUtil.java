@@ -1,15 +1,17 @@
 package com.zpf.modelsqlite;
 
+import android.support.annotation.NonNull;
+
 /**
+ * 提供单例共外部使用
  * Created by ZPF on 2018/4/25.
  */
-
 public class CacheUtil {
     private static volatile CacheDao mDao;
     private static CacheInitInterface mInitInfo;
 
     //一定要先执行
-    public static void init(CacheInitInterface info) {
+    public static void init(@NonNull CacheInitInterface info) {
         mInitInfo = info;
     }
 

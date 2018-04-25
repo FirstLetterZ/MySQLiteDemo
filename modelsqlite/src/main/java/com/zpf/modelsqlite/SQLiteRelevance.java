@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 关联对象必须有一个public的构建函数
+ * 注解字段与其他表关联
+ * 关联对象必须支持newInstance()
  * Created by ZPF on 2018/4/24.
  */
 @Target(ElementType.FIELD)

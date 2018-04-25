@@ -3,6 +3,7 @@ package com.zpf.modelsqlite;
 import android.content.Context;
 
 /**
+ * 获取创建CacheDao所需要的参数
  * Created by ZPF on 2018/4/25.
  */
 

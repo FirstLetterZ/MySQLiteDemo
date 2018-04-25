@@ -31,18 +31,19 @@ public class CacheDao {
 
     public CacheDao(CacheInitInterface initInterface) {
         if (initInterface == null) {
-            throw new IllegalStateException("uninitialized!Please complete the initialization first.");
-        }
-        mInitInfo = initInterface;
-        String path = mInitInfo.getDataBaseFolderPath();
-        if (path == null) {
-            path = SQLiteConfig.DB_USER_CACHE;
-        } else if (path.endsWith("/")) {
-            path = path + SQLiteConfig.DB_USER_CACHE;
+            throw new NullPointerException("CacheInitInterface is null");
         } else {
-            path = path + "/" + SQLiteConfig.DB_USER_CACHE;
+            mInitInfo = initInterface;
+            String path = mInitInfo.getDataBaseFolderPath();
+            if (path == null) {
+                path = SQLiteConfig.DB_USER_CACHE;
+            } else if (path.endsWith("/")) {
+                path = path + SQLiteConfig.DB_USER_CACHE;
+            } else {
+                path = path + "/" + SQLiteConfig.DB_USER_CACHE;
+            }
+            mSQLiteDatabase = new CacheSQLiteHelper(mInitInfo.getContext(), path).getWritableDatabase();
         }
-        mSQLiteDatabase = new CacheSQLiteHelper(mInitInfo.getContext(), path).getWritableDatabase();
     }
 
     public void closeDB() {
@@ -75,7 +76,7 @@ public class CacheDao {
     /**
      * 单条查找获得光标
      */
-    public Cursor getSelectCursor(SQLiteInfo info) {
+    public Cursor getSelectCursor(@NonNull SQLiteInfo info) {
         StringBuilder sql = new StringBuilder(120);
         sql.append(SQL_SELECT);
         String[] whereArg = appendWhere(sql, info);
@@ -287,7 +288,7 @@ public class CacheDao {
         boolean result = false;
         Cursor cursor = getSelectCursor(info);
         if (cursor.moveToFirst()) {
-            putValueToReceiver(getAllFields(receiver), receiver, cursor);
+            putValueToReceiver(receiver, cursor);
             result = true;
         }
         cursor.close();
@@ -297,40 +298,62 @@ public class CacheDao {
     /**
      * 多条查询，返回list
      */
-    public <T> List<T> selectValueList(Class<T> cls, SQLiteInfo info) {
-        return selectValueList(cls, info, 0, 100);
+    public <T> List<T> selectValueList(@NonNull final Class<T> cls, @NonNull SQLiteInfo info) {
+        return selectValueList(cls, info, 0, 20);
     }
 
-    public <T> List<T> selectValueList(Class<T> cls, SQLiteInfo info, int startIndex, @IntRange(from = 0, to = 10000) int size) {
-        SQLiteClassify classify = cls.getAnnotation(SQLiteClassify.class);
-        List<T> list = new ArrayList<>();
-        if (classify != null) {
-            Cursor cursor = getSelectCursor(info);
-            int i = startIndex;
-            while (cursor.moveToPosition(i) && size > 0) {
+    public <T> List<T> selectValueList(@NonNull final Class<T> cls, @NonNull SQLiteInfo info,
+                                       int startIndex, @IntRange(from = 0, to = 10000) int size) {
+        ClassObjectCreator<T> creator = new ClassObjectCreator<T>() {
+            @Override
+            public T create() {
+                T result = null;
                 try {
-                    T receiver = cls.newInstance();
-                    if (receiver != null) {
-                        putValueToReceiver(getAllFields(cls), receiver, cursor);
-                        list.add(receiver);
-                    }
+                    result = cls.newInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    i++;
-                    size--;
                 }
+                return result;
             }
-            cursor.close();
+        };
+        return selectValueList(creator, info, startIndex, size);
+    }
+
+    public <T> List<T> selectValueList(@NonNull ClassObjectCreator<T> creator, @NonNull SQLiteInfo info) {
+        return selectValueList(creator, info, 0, 20);
+    }
+
+    public <T> List<T> selectValueList(@NonNull ClassObjectCreator<T> creator, @NonNull SQLiteInfo info,
+                                       @IntRange(from = 0) int startIndex, @IntRange(from = 0, to = 10000) int size) {
+        List<T> list = new ArrayList<>();
+        Cursor cursor = getSelectCursor(info);
+        int i = startIndex;
+        while (cursor.moveToPosition(i) && size > 0) {
+            try {
+                T receiver = creator.create();
+                if (receiver != null) {
+                    putValueToReceiver(receiver, cursor);
+                    list.add(receiver);
+                } else {
+                    Log.e(TAG, "receiver创建失败");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "selectValueList：" + e.toString());
+                e.printStackTrace();
+            } finally {
+                i++;
+                size--;
+            }
         }
+        cursor.close();
         return list;
     }
 
     /**
      * 对receiver赋值
      */
-    private void putValueToReceiver(List<Field> fields, Object receiver, Cursor cursor) {
-        for (Field field : fields) {
+    private void putValueToReceiver(Object receiver, Cursor cursor) {
+        for (Field field : getAllFields(receiver)) {
             SQLiteColumn note = field.getAnnotation(SQLiteColumn.class);
             if (note != null) {
                 int column = note.column().getValue();
@@ -347,6 +370,7 @@ public class CacheDao {
                         field.set(receiver, value);
                     }
                 } catch (Exception e) {
+                    Log.e(TAG, "putValueToReceiver SQLiteColumn!=null：" + e.toString());
                     e.printStackTrace();
                 } finally {
                     field.setAccessible(false);
@@ -365,9 +389,8 @@ public class CacheDao {
                                 field.setAccessible(true);
                                 field.set(receiver, relevanceObj);
                             }
-                        } catch (InstantiationException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (Exception e) {
+                            Log.e(TAG, "putValueToReceiver SQLiteRelevance!=null：" + e.toString());
                             e.printStackTrace();
                         } finally {
                             field.setAccessible(false);
@@ -391,6 +414,7 @@ public class CacheDao {
                     Object value = field.get(model);
                     info.getQueryInfoList().add(new ColumnInfo(note.column(), SQLiteConfig.RELATION_EQUALITY, value));
                 } catch (IllegalAccessException e) {
+                    Log.e(TAG, "initQueryInfoList：" + e.toString());
                     e.printStackTrace();
                 } finally {
                     field.setAccessible(false);
@@ -412,6 +436,7 @@ public class CacheDao {
                     Object value = field.get(model);
                     info.getChangeValueList().add(new ColumnInfo(note.column(), value));
                 } catch (IllegalAccessException e) {
+                    Log.e(TAG, "initChangeValueList SQLiteColumn!=null：" + e.toString());
                     e.printStackTrace();
                 } finally {
                     field.setAccessible(false);
@@ -438,6 +463,7 @@ public class CacheDao {
                                         saveValue(obj, sqLiteInfo);
                                     }
                                 } catch (IllegalAccessException e) {
+                                    Log.e(TAG, "initChangeValueList SQLiteRelevance!=null：" + e.toString());
                                     e.printStackTrace();
                                 } finally {
                                     f.setAccessible(false);

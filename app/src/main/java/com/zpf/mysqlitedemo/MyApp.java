@@ -6,6 +6,8 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.zpf.modelsqlite.CacheDao;
+import com.zpf.modelsqlite.CacheInitInterface;
+import com.zpf.modelsqlite.CacheUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         myApp = this;
-        CacheDao.init(new CacheDao.CacheInfo() {
+        CacheUtil.init(new CacheInitInterface() {
             @Override
             public Context getContext() {
                 return getApplicationContext();
@@ -59,7 +61,7 @@ public class MyApp extends Application {
     public boolean removeActivity(Activity activity) {
         boolean result = activityList.remove(activity);
         if (activityList.size() == 0) {
-            CacheDao.closeDB();
+            CacheUtil.closeDB();
         }
         return result;
     }

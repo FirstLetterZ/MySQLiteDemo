@@ -1,7 +1,6 @@
 package com.zpf.modelsqlite;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.IntRange;
@@ -28,61 +27,49 @@ public class CacheDao {
     private final String SQL_DELETE = "DELETE FROM " + SQLiteConfig.TB_CACHE + WHERE;
     private SQLiteDatabase mSQLiteDatabase;
     private String TAG = "ModelSQLite";
-    private static volatile CacheDao mDao;
-    private static CacheInfo mInfo;
+    private CacheInitInterface mInitInfo;
 
-    //一定要先执行
-    public static void init(CacheInfo info) {
-        mInfo = info;
-    }
-
-    private CacheDao() {
-        if (mInfo != null) {
-            String path = mInfo.getDataBaseFolderPath();
-            if (path == null) {
-                path = SQLiteConfig.DB_USER_CACHE;
-            } else if (path.endsWith("/")) {
-                path = path + SQLiteConfig.DB_USER_CACHE;
-            } else {
-                path = path + "/" + SQLiteConfig.DB_USER_CACHE;
-            }
-            mSQLiteDatabase = new CacheSQLiteHelper(mInfo.getContext(), path).getWritableDatabase();
-        } else {
+    public CacheDao(CacheInitInterface initInterface) {
+        if (initInterface == null) {
             throw new IllegalStateException("uninitialized!Please complete the initialization first.");
         }
-    }
-
-    public static CacheDao instance() {
-        if (mDao == null) {
-            synchronized (CacheDao.class) {
-                if (mDao == null) {
-                    mDao = new CacheDao();
-                }
-            }
+        mInitInfo = initInterface;
+        String path = mInitInfo.getDataBaseFolderPath();
+        if (path == null) {
+            path = SQLiteConfig.DB_USER_CACHE;
+        } else if (path.endsWith("/")) {
+            path = path + SQLiteConfig.DB_USER_CACHE;
+        } else {
+            path = path + "/" + SQLiteConfig.DB_USER_CACHE;
         }
-        return mDao;
+        mSQLiteDatabase = new CacheSQLiteHelper(mInitInfo.getContext(), path).getWritableDatabase();
     }
 
-    public static void closeDB() {
-        if (mDao != null && mDao.mSQLiteDatabase != null && mDao.mSQLiteDatabase.isOpen()) {
-            mDao.mSQLiteDatabase.close();
+    public void closeDB() {
+        if (mSQLiteDatabase != null && mSQLiteDatabase.isOpen()) {
+            mSQLiteDatabase.close();
         }
-        mDao = null;
-    }
-
-    //用于初始化
-    public interface CacheInfo {
-        Context getContext();//获取上下文
-
-        String getDataBaseFolderPath();//数据库文件位置,可以为null
-
-        String toJson(Object object);//将数据转成json格式的字符串，具体实现方式由使用者决定
-
-        Object fromJson(String json, Class<?> cls);//将json格式转化成对应的对象，具体实现方式由使用者决定
     }
 
     public void setTAG(String TAG) {
         this.TAG = TAG;
+    }
+
+    /**
+     * 查询数据库中的总条数.
+     *
+     * @return
+     */
+    public long getCount() {
+        long count = -1;
+        if (mSQLiteDatabase != null && mSQLiteDatabase.isOpen()) {
+            String sql = "select count(*) from info";
+            Cursor cursor = mSQLiteDatabase.rawQuery(sql, null);
+            cursor.moveToFirst();
+            count = cursor.getLong(0);
+            cursor.close();
+        }
+        return count;
     }
 
     /**
@@ -352,8 +339,8 @@ public class CacheDao {
                     Object value = getValueByCursor(cursor, column);
                     if (value != null && (value instanceof String)
                             && field.getType() != String.class) {
-                        if (mInfo != null) {
-                            Object newValue = mInfo.fromJson(value.toString(), field.getType());
+                        if (mInitInfo != null) {
+                            Object newValue = mInitInfo.fromJson(value.toString(), field.getType());
                             field.set(receiver, newValue);
                         }
                     } else {
@@ -601,8 +588,8 @@ public class CacheDao {
             } else if (value instanceof String) {
                 result = (String) value;
             } else {
-                if (mInfo != null) {
-                    result = mInfo.toJson(value);
+                if (mInitInfo != null) {
+                    result = mInitInfo.toJson(value);
                 }
                 if (result == null) {
                     result = value.toString();
@@ -623,7 +610,7 @@ public class CacheDao {
         List<Field> fieldList = new ArrayList<>();
         while (tempClass != null) {//当父类为null的时候说明到达了最上层的父类(Object类).
             fieldList.addAll(Arrays.asList(tempClass.getDeclaredFields()));
-            tempClass = tempClass.getSuperclass(); //得到父类,然后赋给自己
+            tempClass = tempClass.getSuperclass();
         }
         return fieldList;
     }

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.zpf.modelsqlite.CacheDao;
+import com.zpf.modelsqlite.CacheUtil;
 import com.zpf.modelsqlite.ColumnEnum;
 import com.zpf.modelsqlite.SQLiteInfo;
 
@@ -61,11 +61,11 @@ public class MainActivity extends Activity {
                     testInfo.setTestString(getValue(etString01));
                     int a;
                     if (TextUtils.isEmpty(getValue(etInt02))) {
-                        a = CacheDao.instance().saveValue(testInfo);
+                        a = CacheUtil.instance().saveValue(testInfo);
                     } else {
                         SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_TEST)
                                 .addQueryCondition(ColumnEnum.COLUMN_INT_001, getValue(etInt02));
-                        a = CacheDao.instance().saveValue(testInfo, sqLiteInfo);
+                        a = CacheUtil.instance().saveValue(testInfo, sqLiteInfo);
                     }
                     if (a == -1) {
                         tvMsg.setText("保存失败！");
@@ -85,7 +85,7 @@ public class MainActivity extends Activity {
                 } else {
                     SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_TEST);
                     sqLiteInfo.addQueryCondition(ColumnEnum.COLUMN_INT_001, getValue(etInt02));
-                    CacheDao.instance().delete(sqLiteInfo);
+                    CacheUtil.instance().delete(sqLiteInfo);
                     tvMsg.setText("数据已删除");
                 }
             }
@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
                     SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_TEST);
                     sqLiteInfo.addQueryCondition(ColumnEnum.COLUMN_INT_001, getValue(etInt02));
                     TestInfo info = new TestInfo();
-                    boolean success = CacheDao.instance().selectValueModel(info, sqLiteInfo);
+                    boolean success = CacheUtil.instance().selectValueModel(info, sqLiteInfo);
                     if (success) {
                         String text = gson.toJson(info);
                         tvMsg.setText("数据查询结果：" + text);

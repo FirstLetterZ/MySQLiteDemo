@@ -10,7 +10,8 @@ public class SQLiteConfig {
 
     public static final String DB_USER_CACHE = "userCache.db";
     public static final String TB_CACHE = "userCache";
-    public static final String FIRST_KEY_WORD = "keyword";
+    public static final String FIRST_KEY_WORD = "keyword";//“表名”
+    public static final String OTHER = "other";//预留列
     public static final String COLUMN_NAME = "column";
 
     public static final int TYPE_SHORT = 1000;

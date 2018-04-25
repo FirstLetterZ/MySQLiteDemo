@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -280,12 +281,26 @@ public class CacheDao {
     /**
      * 单条查询，保存至指定model
      */
+    public boolean selectValueModel(Object receiver) {
+        if (receiver == null) {
+            return false;
+        }
+        SQLiteClassify classify = receiver.getClass().getAnnotation(SQLiteClassify.class);
+        if (classify == null) {
+            return false;
+        }
+        SQLiteInfo info = new SQLiteInfo(classify.tableName());
+        return selectValueModel(receiver, info);
+    }
+
     public boolean selectValueModel(Object receiver, SQLiteInfo info) {
+        if (receiver == null) {
+            return false;
+        }
         boolean result = false;
         Cursor cursor = getSelectCursor(info);
         if (cursor.moveToFirst()) {
-            Field[] fields = receiver.getClass().getDeclaredFields();
-            putValueToReceiver(fields, receiver, cursor);
+            putValueToReceiver(getAllFields(receiver), receiver, cursor);
             result = true;
         }
         cursor.close();
@@ -304,13 +319,12 @@ public class CacheDao {
         List<T> list = new ArrayList<>();
         if (classify != null) {
             Cursor cursor = getSelectCursor(info);
-            Field[] fields = cls.getDeclaredFields();
             int i = startIndex;
             while (cursor.moveToPosition(i) && size > 0) {
                 try {
                     T receiver = cls.newInstance();
                     if (receiver != null) {
-                        putValueToReceiver(fields, receiver, cursor);
+                        putValueToReceiver(getAllFields(cls), receiver, cursor);
                         list.add(receiver);
                     }
                 } catch (Exception e) {
@@ -328,7 +342,7 @@ public class CacheDao {
     /**
      * 对receiver赋值
      */
-    private void putValueToReceiver(Field[] fields, Object receiver, Cursor cursor) {
+    private void putValueToReceiver(List<Field> fields, Object receiver, Cursor cursor) {
         for (Field field : fields) {
             SQLiteColumn note = field.getAnnotation(SQLiteColumn.class);
             if (note != null) {
@@ -337,7 +351,7 @@ public class CacheDao {
                     field.setAccessible(true);
                     Object value = getValueByCursor(cursor, column);
                     if (value != null && (value instanceof String)
-                            && !TextUtils.equals(field.getType().getName(), String.class.getName())) {
+                            && field.getType() != String.class) {
                         if (mInfo != null) {
                             Object newValue = mInfo.fromJson(value.toString(), field.getType());
                             field.set(receiver, newValue);
@@ -350,6 +364,29 @@ public class CacheDao {
                 } finally {
                     field.setAccessible(false);
                 }
+            } else {
+                SQLiteRelevance relevance = field.getAnnotation(SQLiteRelevance.class);
+                if (relevance != null) {
+                    SQLiteClassify classify = field.getType().getAnnotation(SQLiteClassify.class);
+                    if (classify != null) {
+                        int column = relevance.saveColumn().getValue();
+                        Object value = getValueByCursor(cursor, column);
+                        try {
+                            Object relevanceObj = field.getType().newInstance();
+                            if (selectValueModel(relevanceObj, new SQLiteInfo(classify.tableName())
+                                    .addQueryCondition(new ColumnInfo(relevance.targetColumn(), value)))) {
+                                field.setAccessible(true);
+                                field.set(receiver, relevanceObj);
+                            }
+                        } catch (InstantiationException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } finally {
+                            field.setAccessible(false);
+                        }
+                    }
+                }
             }
         }
     }
@@ -359,8 +396,7 @@ public class CacheDao {
      * 同SQLiteInfo.addQueryCondition
      */
     public void initQueryInfoList(@NonNull Object model, SQLiteInfo info) {
-        Field[] fields = model.getClass().getDeclaredFields();
-        for (Field field : fields) {
+        for (Field field : getAllFields(model)) {
             SQLiteColumn note = field.getAnnotation(SQLiteColumn.class);
             if (note != null) {
                 field.setAccessible(true);
@@ -376,22 +412,54 @@ public class CacheDao {
         }
     }
 
+
     /**
      * 将model值转转为赋值条件
      */
     private void initChangeValueList(@NonNull Object model, @NonNull SQLiteInfo info) {
-        Field[] fields = model.getClass().getDeclaredFields();
-        for (Field field : fields) {
+        for (Field field : getAllFields(model)) {
             SQLiteColumn note = field.getAnnotation(SQLiteColumn.class);
             if (note != null) {
                 field.setAccessible(true);
                 try {
                     Object value = field.get(model);
-                    info.getChangeValueList().add(new ColumnInfo(note.column(), "", value));
+                    info.getChangeValueList().add(new ColumnInfo(note.column(), value));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } finally {
                     field.setAccessible(false);
+                }
+            } else {
+                SQLiteRelevance relevance = field.getAnnotation(SQLiteRelevance.class);
+                if (relevance != null) {
+                    Class<?> clz = field.getType();
+                    SQLiteClassify classify = clz.getAnnotation(SQLiteClassify.class);
+                    if (classify != null) {
+                        //查找对应列的值
+                        for (Field f : getAllFields(field.getType())) {
+                            if (f.getAnnotation(SQLiteColumn.class) != null
+                                    && relevance.targetColumn() == f.getAnnotation(SQLiteColumn.class).column()) {
+                                field.setAccessible(true);
+                                try {
+                                    Object obj = field.get(model);
+                                    if (obj != null) {
+                                        f.setAccessible(true);
+                                        Object value = f.get(obj);
+                                        info.getChangeValueList().add(new ColumnInfo(relevance.saveColumn(), value));
+                                        SQLiteInfo sqLiteInfo = new SQLiteInfo(classify.tableName())
+                                                .addQueryCondition(new ColumnInfo(relevance.targetColumn(), value));
+                                        saveValue(obj, sqLiteInfo);
+                                    }
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    f.setAccessible(false);
+                                    field.setAccessible(false);
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -547,4 +615,16 @@ public class CacheDao {
         return result;
     }
 
+    private List<Field> getAllFields(@NonNull Object model) {
+        return getAllFields(model.getClass());
+    }
+
+    private List<Field> getAllFields(@NonNull Class<?> tempClass) {
+        List<Field> fieldList = new ArrayList<>();
+        while (tempClass != null) {//当父类为null的时候说明到达了最上层的父类(Object类).
+            fieldList.addAll(Arrays.asList(tempClass.getDeclaredFields()));
+            tempClass = tempClass.getSuperclass(); //得到父类,然后赋给自己
+        }
+        return fieldList;
+    }
 }

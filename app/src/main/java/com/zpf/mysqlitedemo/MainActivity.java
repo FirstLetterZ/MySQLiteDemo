@@ -14,13 +14,16 @@ import com.zpf.modelsqlite.CacheDao;
 import com.zpf.modelsqlite.ColumnEnum;
 import com.zpf.modelsqlite.SQLiteInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends Activity {
 
     private EditText etInt01;
     private EditText etString01;
     private EditText etInt02;
     private TextView tvMsg;
-    private TestInfo testInfo = new TestInfo();
+    private TestInfo testInfo;
     private Gson gson = new Gson();
 
     @Override
@@ -29,6 +32,15 @@ public class MainActivity extends Activity {
         MyApp.instance().addActivity(this);
         setContentView(R.layout.activity_main);
         initView();
+        testInfo = new TestInfo();
+        List<Info> testArray = new ArrayList<>();
+        testArray.add(new Info(1, "001"));
+        testArray.add(new Info(12, "002"));
+        testInfo.setStringArray(testArray);
+        InsideBean bean = new InsideBean();
+        bean.setInsideTestInt(1234);
+        bean.setInsideTestString("测试更改");
+        testInfo.setTestObject(bean);
     }
 
     private void initView() {
@@ -51,8 +63,8 @@ public class MainActivity extends Activity {
                     if (TextUtils.isEmpty(getValue(etInt02))) {
                         a = CacheDao.instance().saveValue(testInfo);
                     } else {
-                        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_TEST);
-                        sqLiteInfo.addQueryCondition(ColumnEnum.COLUMN_INT_001, getValue(etInt02));
+                        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_TEST)
+                                .addQueryCondition(ColumnEnum.COLUMN_INT_001, getValue(etInt02));
                         a = CacheDao.instance().saveValue(testInfo, sqLiteInfo);
                     }
                     if (a == -1) {

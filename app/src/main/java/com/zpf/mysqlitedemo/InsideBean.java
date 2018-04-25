@@ -1,16 +1,22 @@
 package com.zpf.mysqlitedemo;
 
+import com.zpf.modelsqlite.ColumnEnum;
+import com.zpf.modelsqlite.SQLiteClassify;
+import com.zpf.modelsqlite.SQLiteColumn;
+
+
 /**
  * Created by ZPF on 2018/1/29.
  */
-
+@SQLiteClassify(tableName = AppConfig.TB_INSERT)
 public class InsideBean {
-    private int insideTestInt = 1;
-    private float insideTestFloat = 2.0f;
+    private int insideTestInt;
+    private float insideTestFloat;
     private boolean insideTestBoolean = true;
-    private long insideTestLong = 3L;
-    private short insideTestShort = 4;
-    private double insideTestDouble = 5d;
+    private long insideTestLong;
+    private short insideTestShort;
+    private double insideTestDouble;
+    @SQLiteColumn(column = ColumnEnum.COLUMN_STRING_001)
     private String insideTestString = "test bean";
 
     public int getInsideTestInt() {

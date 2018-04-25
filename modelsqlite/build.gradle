@@ -1,38 +1,56 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    lintOptions{
+    lintOptions {
         abortOnError false
+    }
+    productFlavors {
     }
 }
 
-task makeJar(type: Copy) {
-    delete 'build/libs/ModleSQLite.jar'
-    from('build/intermediates/bundles/release/')
-    into('build/libs/')
-    include('classes.jar')
-    rename ('classes.jar', 'ModleSQLite.jar')
+task clearJar(type: Delete) {
+    delete 'build/outputs/ModleSQLite.jar'
+}
+//获取到需要到处的文件
+def releaseJar = file('build/intermediates/intermediate-jars/debug/classes.jar')
+
+task makeJar(type: Jar) {
+    baseName 'ModleSQLite'
+    //从哪里打包class文件 路径默认打包到build/libs
+    from  zipTree(releaseJar)
+    //去掉不需要打包的目录和文件
+    exclude('test/', 'BuildConfig.class', 'R.class')
+    //去掉R$开头的文件
+    exclude { it.name.startsWith('R$') }
+
+//    delete 'build/libs/ModleSQLite.jar'
+    //AS2.0
+//    from('build/intermediates/bundles/release/')
+//    into('build/libs/')
+    //AS3.0
+//    from('build/intermediates/intermediate-jars/debug/')
+//    into('build/outputs/')
+//    include('classes.jar')
+//    rename('classes.jar', 'ModleSQLite.jar')
 }
 
 makeJar.dependsOn(build)//gradlew makeJar
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-annotations:26.1.0'
+    compile 'com.android.support:support-annotations:27.1.1'
 }

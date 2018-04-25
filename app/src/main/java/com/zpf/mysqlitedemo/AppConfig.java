@@ -6,4 +6,5 @@ package com.zpf.mysqlitedemo;
 
 public class AppConfig {
     public static final String TB_TEST ="测试表格" ;
+    public static final String TB_INSERT ="内部表格" ;
 }

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/ll_student"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Student"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="id："
+                />
+
+            <EditText
+                android:id="@+id/et_student_id"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="5"
+                android:textSize="14sp"
+                tool:text="12345"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="name："
+                />
+
+            <EditText
+                android:id="@+id/et_student_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="20"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textSize="14sp"
+                tool:text="Student"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="age："
+                />
+
+            <EditText
+                android:id="@+id/et_student_age"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="5"
+                android:textSize="14sp"
+                tool:text="12345"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="性别："/>
+
+            <RadioGroup
+                android:id="@+id/rg_sex"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_man"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="男"/>
+
+                <RadioButton
+                    android:id="@+id/rb_woman"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="女"/>
+            </RadioGroup>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Group"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="id："
+                />
+
+            <EditText
+                android:id="@+id/et_group_id"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="5"
+                android:textSize="14sp"
+                tool:text="12345"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="name："
+                />
+
+            <EditText
+                android:id="@+id/et_group_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="20"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textSize="14sp"
+                tool:text="Group"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btn_modify"
+            style="@style/button"
+            android:text="修改"/>
+        <Button
+            android:id="@+id/btn_delete"
+            style="@style/button"
+            android:text="删除"/>
+        <Button
+            android:id="@+id/btn_confirm"
+            style="@style/button"
+            android:text="确认"/>
+        <Button
+            android:id="@+id/btn_find"
+            style="@style/button"
+            android:text="查找"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_find_result"
+        android:padding="4dp"
+        android:visibility="gone"
+        android:background="@color/main_bg"
+        android:minHeight="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

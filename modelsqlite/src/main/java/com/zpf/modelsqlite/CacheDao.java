@@ -277,20 +277,19 @@ public class CacheDao {
      * 单条查询，保存至指定model
      */
     public boolean selectValueModel(Object receiver) {
-        if (receiver == null) {
-            return false;
-        }
-        SQLiteClassify classify = receiver.getClass().getAnnotation(SQLiteClassify.class);
-        if (classify == null) {
-            return false;
-        }
-        SQLiteInfo info = new SQLiteInfo(classify.tableName());
-        return selectValueModel(receiver, info);
+        return selectValueModel(receiver, null);
     }
 
     public boolean selectValueModel(Object receiver, SQLiteInfo info) {
         if (receiver == null) {
             return false;
+        }
+        if (info == null) {
+            SQLiteClassify classify = receiver.getClass().getAnnotation(SQLiteClassify.class);
+            if (classify == null) {
+                return false;
+            }
+            info = new SQLiteInfo(classify.tableName());
         }
         boolean result = false;
         Cursor cursor = getSelectCursor(info);
@@ -327,7 +326,7 @@ public class CacheDao {
     }
 
     public <T> List<T> selectValueList(@NonNull ClassObjectCreator<T> creator, @NonNull SQLiteInfo info) {
-        return selectValueList(creator, info, 0, 20);
+        return selectValueList(creator, info, 0, 100);
     }
 
     public <T> List<T> selectValueList(@NonNull ClassObjectCreator<T> creator, @NonNull SQLiteInfo info,

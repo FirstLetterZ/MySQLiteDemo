@@ -105,7 +105,8 @@ public class DetailActivity extends BaseActivity {
                     toast("id 不能为空");
                     return;
                 }
-                SQLiteInfo sqLiteInfo = new SQLiteInfo(tb).addQueryCondition(ColumnEnum.COLUMN_INT_001, id);
+                SQLiteInfo sqLiteInfo = new SQLiteInfo(tb)
+                        .addQueryCondition(ColumnEnum.COLUMN_INT_001, id);
                 CacheUtil.instance().delete(sqLiteInfo);
             }
         });
@@ -274,7 +275,8 @@ public class DetailActivity extends BaseActivity {
             student.setGroup(group);
             CacheUtil.instance().saveValue(student, sqLiteInfo);
         } else {
-            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP).addQueryCondition(ColumnEnum.COLUMN_INT_001, groupId);
+            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
+                    .addQueryCondition(ColumnEnum.COLUMN_INT_001, groupId);
             if (CacheUtil.instance().selectValueModel(new Group(), sqLiteInfo)) {
                 toast("id=" + groupId + "的条目已存在，更新条目内容");
             } else {

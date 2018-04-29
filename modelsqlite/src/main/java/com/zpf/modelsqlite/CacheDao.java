@@ -43,7 +43,7 @@ public class CacheDao {
         }
         if (mSQLiteDatabase == null || !mSQLiteDatabase.isOpen()) {
             String path = mInitInfo.getDataBaseFolderPath();
-            if (path == null) {
+            if (path == null || path.length() == 0) {
                 path = SQLiteConfig.DB_USER_CACHE;
             } else if (path.endsWith("/")) {
                 path = path + SQLiteConfig.DB_USER_CACHE;

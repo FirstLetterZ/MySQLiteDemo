@@ -12,12 +12,22 @@ import android.support.annotation.Nullable;
 public interface CacheInitInterface {
 
     @NonNull
-    Context getContext();//获取上下文
+    Context getContext();
 
+    /**
+     * 数据库文件位置,如果返回null或""，则使用系统默认位置"data/< 项目文件夹 >/databases/"，
+     * 否则需要注意提前判断是否需要读写权限
+     */
     @Nullable
-    String getDataBaseFolderPath();//数据库文件位置,可以为null
+    String getDataBaseFolderPath();
 
-    String toJson(Object object);//将数据转成json格式的字符串，具体实现方式由使用者决定
+    /**
+     * 将数据转成json格式的字符串，具体实现方式由使用者决定
+     */
+    String toJson(Object object);
 
-    Object fromJson(String json, Class<?> cls);//将json格式转化成对应的对象，具体实现方式由使用者决定
+    /**
+     * 将json格式转化成对应的对象，具体实现方式由使用者决定
+     */
+    Object fromJson(String json, Class<?> cls);
 }

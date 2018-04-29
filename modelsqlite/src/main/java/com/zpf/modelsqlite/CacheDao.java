@@ -25,7 +25,7 @@ public class CacheDao {
     private final String SQL_UPDATE = "UPDATE " + SQLiteConfig.TB_CACHE + " SET ";
     private final String SQL_INSERT = "INSERT INTO " + SQLiteConfig.TB_CACHE + "(";
     private final String SQL_DELETE = "DELETE FROM " + SQLiteConfig.TB_CACHE + WHERE;
-    private SQLiteDatabase mSQLiteDatabase;
+    private SQLiteDatabase mSQLiteDatabase;//不直接使用，通过 getSQLiteDatabase()获取
     private String TAG = "ModelSQLite";
     private CacheInitInterface mInitInfo;
 
@@ -34,6 +34,14 @@ public class CacheDao {
             throw new NullPointerException("CacheInitInterface is null");
         } else {
             mInitInfo = initInterface;
+        }
+    }
+
+    private SQLiteDatabase getSQLiteDatabase() {
+        if (mInitInfo == null) {
+            throw new NullPointerException("CacheInitInterface is null");
+        }
+        if (mSQLiteDatabase == null || !mSQLiteDatabase.isOpen()) {
             String path = mInitInfo.getDataBaseFolderPath();
             if (path == null) {
                 path = SQLiteConfig.DB_USER_CACHE;
@@ -42,13 +50,15 @@ public class CacheDao {
             } else {
                 path = path + "/" + SQLiteConfig.DB_USER_CACHE;
             }
-            mSQLiteDatabase = new CacheSQLiteHelper(mInitInfo.getContext(), path).getWritableDatabase();
+            mSQLiteDatabase = new CacheSQLiteHelper(mInitInfo.getContext().getApplicationContext(), path).getWritableDatabase();
         }
+        return mSQLiteDatabase;
     }
 
     public void closeDB() {
         if (mSQLiteDatabase != null && mSQLiteDatabase.isOpen()) {
             mSQLiteDatabase.close();
+            mSQLiteDatabase = null;
         }
     }
 
@@ -62,14 +72,11 @@ public class CacheDao {
      * @return
      */
     public long getCount() {
-        long count = -1;
-        if (mSQLiteDatabase != null && mSQLiteDatabase.isOpen()) {
-            String sql = "select count(*) from info";
-            Cursor cursor = mSQLiteDatabase.rawQuery(sql, null);
-            cursor.moveToFirst();
-            count = cursor.getLong(0);
-            cursor.close();
-        }
+        String sql = "select count(*) from info";
+        Cursor cursor = getSQLiteDatabase().rawQuery(sql, null);
+        cursor.moveToFirst();
+        long count = cursor.getLong(0);
+        cursor.close();
         return count;
     }
 
@@ -84,7 +91,7 @@ public class CacheDao {
         if (!TextUtils.isEmpty(info.getOtherCondition())) {
             sql.append(info.getOtherCondition());
         }
-        return mSQLiteDatabase.rawQuery(sql.toString(), whereArg);
+        return getSQLiteDatabase().rawQuery(sql.toString(), whereArg);
     }
 
     public int saveValue(@NonNull Object value) {
@@ -145,7 +152,7 @@ public class CacheDao {
         }
         sql.append(WHERE);
         appendWhere(sql, info, bindArgs, valuesSize);
-        mSQLiteDatabase.execSQL(sql.toString(), bindArgs);
+        getSQLiteDatabase().execSQL(sql.toString(), bindArgs);
     }
 
     /**
@@ -170,7 +177,7 @@ public class CacheDao {
             sql.append((i > 0) ? ",?" : "?");
         }
         sql.append(')');
-        mSQLiteDatabase.execSQL(sql.toString(), bindArgs);
+        getSQLiteDatabase().execSQL(sql.toString(), bindArgs);
     }
 
     /**
@@ -200,7 +207,7 @@ public class CacheDao {
             contentValues.put(columnName, toString(data));
         }
         String where = SQLiteConfig.COLUMN_NAME + columnWhere.getColumnName().getValue() + columnWhere.getRelation();
-        return mSQLiteDatabase.update(SQLiteConfig.TB_CACHE, contentValues, where, new String[]{toString(columnWhere.getColumnValue())}) > 0;
+        return getSQLiteDatabase().update(SQLiteConfig.TB_CACHE, contentValues, where, new String[]{toString(columnWhere.getColumnValue())}) > 0;
     }
 
     /**
@@ -208,16 +215,16 @@ public class CacheDao {
      */
     public void saveByArray(@NonNull HashMap<Object, SQLiteInfo> valueArray) {
         if (valueArray.size() > 0) {
-            mSQLiteDatabase.beginTransaction();
+            getSQLiteDatabase().beginTransaction();
             try {
                 for (Map.Entry<Object, SQLiteInfo> entry : valueArray.entrySet()) {
                     saveValue(entry.getKey(), entry.getValue());
                 }
-                mSQLiteDatabase.setTransactionSuccessful();
+                getSQLiteDatabase().setTransactionSuccessful();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             } finally {
-                mSQLiteDatabase.endTransaction();
+                getSQLiteDatabase().endTransaction();
             }
         }
     }
@@ -229,7 +236,7 @@ public class CacheDao {
         StringBuilder sql = new StringBuilder(120);
         sql.append(SQL_DELETE);
         String[] whereArgs = appendWhere(sql, info);
-        mSQLiteDatabase.execSQL(sql.toString(), whereArgs);
+        getSQLiteDatabase().execSQL(sql.toString(), whereArgs);
     }
 
     /**
@@ -237,16 +244,16 @@ public class CacheDao {
      */
     public void deleteByArray(@NonNull List<SQLiteInfo> infoList) {
         if (infoList.size() > 0) {
-            mSQLiteDatabase.beginTransaction();
+            getSQLiteDatabase().beginTransaction();
             try {
                 for (SQLiteInfo info : infoList) {
                     delete(info);
                 }
-                mSQLiteDatabase.setTransactionSuccessful();
+                getSQLiteDatabase().setTransactionSuccessful();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             } finally {
-                mSQLiteDatabase.endTransaction();
+                getSQLiteDatabase().endTransaction();
             }
         }
     }

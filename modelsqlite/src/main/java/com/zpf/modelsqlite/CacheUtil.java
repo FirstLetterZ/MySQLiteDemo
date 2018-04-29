@@ -28,10 +28,11 @@ public class CacheUtil {
 
     public static void closeDB() {
         if (mDao != null) {
-            mDao.closeDB();
-        } else {
             synchronized (CacheUtil.class) {
-                mDao = null;
+                if (mDao != null) {
+                    mDao.closeDB();
+                    mDao = null;
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package com.zpf.mysqlitedemo;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zpf.modelsqlite.CacheDao;
@@ -26,6 +27,7 @@ public class MyApp extends Application {
         super.onCreate();
         myApp = this;
         CacheUtil.init(new CacheInitInterface() {
+            @NonNull
             @Override
             public Context getContext() {
                 return getApplicationContext();

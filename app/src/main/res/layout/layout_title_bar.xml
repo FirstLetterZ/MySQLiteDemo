@@ -9,6 +9,7 @@
         android:id="@+id/tv_left"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:gravity="center"
         android:paddingLeft="10dp"
         android:textColor="@color/white"/>
 
@@ -25,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
+        android:gravity="center"
         android:paddingRight="10dp"
         android:textColor="@color/white"/>
 

@@ -51,9 +51,9 @@ public class StudentAdapter extends RecyclerView.Adapter<ListViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
         holder.tvType.setText("Student");
-        holder.tvId.setText(studentList.get(position).getId());
+        holder.tvId.setText(""+studentList.get(position).getId());
         holder.tvName.setText(studentList.get(position).getName());
-        holder.tvAge.setText(studentList.get(position).getAge());
+        holder.tvAge.setText(""+studentList.get(position).getAge());
         holder.tvSex.setText(studentList.get(position).isFemale() ? "女" : "男");
         final int n=position;
         holder.itemView.setOnClickListener(new View.OnClickListener() {

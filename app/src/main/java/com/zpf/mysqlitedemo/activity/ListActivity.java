@@ -21,6 +21,7 @@ public class ListActivity extends BaseActivity {
     public static final String IS_STUDENT = "is_student_type";
     public static final String IS_SELECT = "is_select";
     private boolean isAsc = false;
+    private final int jumpToDetail = 1234;
 
     @Override
     public int getLayoutId() {
@@ -62,6 +63,7 @@ public class ListActivity extends BaseActivity {
                         intent.putExtra(DetailActivity.IS_STUDENT, true);
                         intent.putExtra(DetailActivity.TYPE, DetailActivity.TYPE_DETAIL);
                         intent.putExtra(DetailActivity.DATA, student);
+                        startActivityForResult(intent, jumpToDetail);
                     }
                 }
             });
@@ -83,6 +85,7 @@ public class ListActivity extends BaseActivity {
                         intent.putExtra(DetailActivity.IS_STUDENT, false);
                         intent.putExtra(DetailActivity.TYPE, DetailActivity.TYPE_DETAIL);
                         intent.putExtra(DetailActivity.DATA, group);
+                        startActivityForResult(intent, jumpToDetail);
                     }
                 }
             });

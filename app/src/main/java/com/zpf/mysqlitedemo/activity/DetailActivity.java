@@ -38,6 +38,7 @@ public class DetailActivity extends BaseActivity {
     private TextView tvFindResult;
     private EditText etStudentId, etStudentName, etStudentAge, etGroupId, etGroupName;
     private RadioGroup rgSex;
+    private RadioButton rbNull;
     private boolean isStudentType;
     private Gson gson = new Gson();
     private String studentId, studentName, studentAge, studentSex, groupId, groupName;
@@ -67,6 +68,7 @@ public class DetailActivity extends BaseActivity {
         etGroupId = findViewById(R.id.et_group_id);
         etGroupName = findViewById(R.id.et_group_name);
         rgSex = findViewById(R.id.rg_sex);
+        rbNull = findViewById(R.id.rb_null);
         //保存
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +84,7 @@ public class DetailActivity extends BaseActivity {
                 etStudentId.setEnabled(false);
                 etStudentAge.setEnabled(true);
                 etStudentName.setEnabled(true);
-                rgSex.setEnabled(true);
+                setRadioGroupEnable(rgSex, true);
                 btnModify.setVisibility(View.GONE);
                 btnDelete.setVisibility(View.GONE);
                 btnConfirm.setVisibility(View.VISIBLE);
@@ -108,6 +110,9 @@ public class DetailActivity extends BaseActivity {
                 SQLiteInfo sqLiteInfo = new SQLiteInfo(tb)
                         .addQueryCondition(ColumnEnum.COLUMN_INT_001, id);
                 CacheUtil.instance().delete(sqLiteInfo);
+                toast("已删除");
+                setResult(RESULT_OK);
+                finish();
             }
         });
         //查找
@@ -137,17 +142,18 @@ public class DetailActivity extends BaseActivity {
         final int type = getIntent().getIntExtra(TYPE, TYPE_ADD);
         switch (type) {
             case TYPE_DETAIL:
+                btnConfirm.setVisibility(View.GONE);
+                btnModify.setVisibility(View.VISIBLE);
+                btnDelete.setVisibility(View.VISIBLE);
+                btnFind.setVisibility(View.GONE);
+                rbNull.setVisibility(View.GONE);
+                etGroupId.setEnabled(false);
+                etGroupName.setEnabled(false);
+                etStudentId.setEnabled(false);
+                etStudentAge.setEnabled(false);
+                etStudentName.setEnabled(false);
                 if (isStudentType) {
-                    btnConfirm.setVisibility(View.GONE);
-                    btnModify.setVisibility(View.VISIBLE);
-                    btnDelete.setVisibility(View.VISIBLE);
-                    btnFind.setVisibility(View.GONE);
-                    etGroupId.setEnabled(false);
-                    etGroupName.setEnabled(false);
-                    etStudentId.setEnabled(false);
-                    etStudentAge.setEnabled(false);
-                    etStudentName.setEnabled(false);
-                    rgSex.setEnabled(false);
+                    setRadioGroupEnable(rgSex, false);
                     Student student = getIntent().getParcelableExtra(DATA);
                     if (student != null) {
                         initWithData(student);
@@ -171,7 +177,7 @@ public class DetailActivity extends BaseActivity {
                 etStudentId.setEnabled(true);
                 etStudentAge.setEnabled(true);
                 etStudentName.setEnabled(true);
-                rgSex.setEnabled(true);
+                setRadioGroupEnable(rgSex, true);
                 if (isStudentType) {
                     llGroup.setVisibility(View.GONE);
                 }
@@ -179,6 +185,7 @@ public class DetailActivity extends BaseActivity {
                 btnModify.setVisibility(View.GONE);
                 btnDelete.setVisibility(View.GONE);
                 btnFind.setVisibility(View.VISIBLE);
+                rbNull.setVisibility(View.VISIBLE);
                 tvTitle.setText("数据查询");
                 tvFindResult.setVisibility(View.VISIBLE);
                 break;
@@ -188,19 +195,30 @@ public class DetailActivity extends BaseActivity {
                 btnModify.setVisibility(View.GONE);
                 btnDelete.setVisibility(View.GONE);
                 btnFind.setVisibility(View.GONE);
+                rbNull.setVisibility(View.GONE);
                 etGroupId.setEnabled(true);
                 etGroupName.setEnabled(true);
                 etStudentId.setEnabled(true);
                 etStudentAge.setEnabled(true);
                 etStudentName.setEnabled(true);
-                rgSex.setEnabled(true);
+                setRadioGroupEnable(rgSex, true);
                 tvTitle.setText("新增");
                 break;
         }
     }
 
 
+    private void setRadioGroupEnable(RadioGroup radioGroup, boolean enable) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            radioGroup.getChildAt(i).setEnabled(enable);
+        }
+    }
+
+
     private void initWithData(Student student) {
+        if (student == null) {
+            return;
+        }
         etStudentId.setText("" + student.getId());
         etStudentName.setText(student.getName());
         String sex = student.isFemale() ? "女" : "男";
@@ -210,6 +228,9 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void initWithData(Group group) {
+        if (group == null) {
+            return;
+        }
         etGroupId.setText("" + group.getId());
         etGroupName.setText(group.getName());
     }
@@ -243,6 +264,7 @@ public class DetailActivity extends BaseActivity {
         Group group = new Group();
         group.setId(Integer.valueOf(groupId));
         group.setName(groupName);
+        int result;
         if (isStudentType) {
             if (TextUtils.isEmpty(studentId)) {
                 toast("student id 不能为空");
@@ -273,7 +295,7 @@ public class DetailActivity extends BaseActivity {
             student.setAge(Integer.valueOf(studentAge));
             student.setName(studentName);
             student.setGroup(group);
-            CacheUtil.instance().saveValue(student, sqLiteInfo);
+            result = CacheUtil.instance().saveValue(student, sqLiteInfo);
         } else {
             SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
                     .addQueryCondition(ColumnEnum.COLUMN_INT_001, groupId);
@@ -282,7 +304,14 @@ public class DetailActivity extends BaseActivity {
             } else {
                 toast("不存在id=" + groupId + "的条目，新建条目");
             }
-            CacheUtil.instance().saveValue(group, sqLiteInfo);
+            result = CacheUtil.instance().saveValue(group, sqLiteInfo);
+        }
+        if (result >= 0) {
+            toast("保存成功");
+            setResult(RESULT_OK);
+            finish();
+        } else {
+            toast("保存失败");
         }
     }
 
@@ -322,12 +351,13 @@ public class DetailActivity extends BaseActivity {
         studentName = etStudentName.getText().toString().trim();
         studentAge = etStudentAge.getText().toString().trim();
         int sexId = rgSex.getCheckedRadioButtonId();
-        if (sexId < 0) {
-            studentSex = null;
+        if (sexId == R.id.rb_man) {
+            studentSex = "男";
+        } else if (sexId == R.id.rb_woman) {
+            studentSex = "女";
         } else {
-            studentSex = sexId == R.id.rb_man ? "男" : "女";
+            studentSex = null;
         }
     }
-
 
 }

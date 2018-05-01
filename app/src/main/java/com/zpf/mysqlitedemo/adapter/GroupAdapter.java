@@ -54,15 +54,15 @@ public class GroupAdapter extends RecyclerView.Adapter<ListViewHolder> {
         holder.tvSexLabel.setVisibility(View.GONE);
         holder.tvAge.setVisibility(View.GONE);
         holder.tvSex.setVisibility(View.GONE);
-        holder.tvType.setText("Student");
-        holder.tvId.setText(groupList.get(position).getId());
+        holder.tvType.setText("Group");
+        holder.tvId.setText("" + groupList.get(position).getId());
         holder.tvName.setText(groupList.get(position).getName());
-        final int n=position;
+        final int n = position;
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(itemClickListener!=null){
-                    itemClickListener.OnItemClick(n,groupList.get(n));
+                if (itemClickListener != null) {
+                    itemClickListener.OnItemClick(n, groupList.get(n));
                 }
             }
         });
@@ -102,6 +102,6 @@ public class GroupAdapter extends RecyclerView.Adapter<ListViewHolder> {
     }
 
     public interface OnItemClickListener {
-        void OnItemClick(int position,Group group);
+        void OnItemClick(int position, Group group);
     }
 }

@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.zpf.modelsqlite.ColumnEnum;
 import com.zpf.modelsqlite.SQLiteClassify;
 import com.zpf.modelsqlite.SQLiteColumn;
+import com.zpf.modelsqlite.SQLiteRelevance;
 
 /**
  * Created by ZPF on 2018/4/29.
@@ -24,17 +25,19 @@ public class Student implements Parcelable {
     @SQLiteColumn(column = ColumnEnum.COLUMN_BOOLEAN_001)
     private boolean female;
 
-    @SQLiteColumn(column = ColumnEnum.COLUMN_INT_003)
+    @SQLiteRelevance(saveColumn = ColumnEnum.COLUMN_INT_003, targetColumn = ColumnEnum.COLUMN_INT_001)
     private Group group;
 
     public Student() {
     }
+
 
     protected Student(Parcel in) {
         id = in.readInt();
         name = in.readString();
         age = in.readInt();
         female = in.readByte() != 0;
+        group = in.readParcelable(Group.class.getClassLoader());
     }
 
     @Override
@@ -43,6 +46,7 @@ public class Student implements Parcelable {
         dest.writeString(name);
         dest.writeInt(age);
         dest.writeByte((byte) (female ? 1 : 0));
+        dest.writeParcelable(group, flags);
     }
 
     @Override

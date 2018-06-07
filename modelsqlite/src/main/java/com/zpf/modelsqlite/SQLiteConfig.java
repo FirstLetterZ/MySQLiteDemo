@@ -23,9 +23,12 @@ public class SQLiteConfig {
     public static final int TYPE_STRING = 7000;
 
     public static final String ORDER = " ORDER BY ";
+    public static final String GROUP = " GROUP BY ";
+    public static final String HAVING_COUNT = " HAVING  count(";
     public static final String ASC = " ASC";
     public static final String DESC = " DESC";
     public static final String LIMIT = " LIMIT ";
+    public static final String OFFSET = " OFFSET ";
     public static final String BETWEEN = " BETWEEN ";
     public static final String AND = " AND ";
 

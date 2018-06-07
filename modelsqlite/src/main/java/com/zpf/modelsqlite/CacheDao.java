@@ -68,8 +68,6 @@ public class CacheDao {
 
     /**
      * 查询数据库中的总条数.
-     *
-     * @return
      */
     public long getCount() {
         String sql = "select count(*) from info";
@@ -87,10 +85,6 @@ public class CacheDao {
         StringBuilder sql = new StringBuilder(120);
         sql.append(SQL_SELECT);
         String[] whereArg = appendWhere(sql, info);
-        appendOrder(sql, info);
-        if (!TextUtils.isEmpty(info.getOtherCondition())) {
-            sql.append(info.getOtherCondition());
-        }
         return getSQLiteDatabase().rawQuery(sql.toString(), whereArg);
     }
 
@@ -311,6 +305,7 @@ public class CacheDao {
     public <T> List<T> selectValueList(@NonNull final Class<T> cls, @NonNull SQLiteInfo info,
                                        int startIndex, @IntRange(from = 0, to = 10000) int size) {
         ClassObjectCreator<T> creator = new ClassObjectCreator<T>() {
+
             @Override
             public T create() {
                 T result = null;
@@ -503,6 +498,7 @@ public class CacheDao {
                 whereArg[index + 1 + i] = toString(info.getQueryInfoList().get(i).getColumnValue());
             }
         }
+        appendOtherCondition(builder, info);
         return whereArg;
     }
 
@@ -525,6 +521,16 @@ public class CacheDao {
                 builder.append(SQLiteConfig.DESC);
             }
         }
+    }
+
+    /**
+     * 添加其他查询条件
+     */
+    private void appendOtherCondition(StringBuilder builder, SQLiteInfo info) {
+        appendOrder(builder, info);
+        builder.append(info.getGroupCondition());
+        builder.append(info.getLimitCondition());
+        builder.append(info.getOtherCondition());
     }
 
     /**

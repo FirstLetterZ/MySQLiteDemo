@@ -3,5 +3,10 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
     </style>
+    <style name="button">
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_width">110dp</item>
+        <item name="android:layout_height">50dp</item>
+    </style>
 
 </resources>

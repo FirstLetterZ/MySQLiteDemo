@@ -43,16 +43,24 @@ public class SQLiteInfo {
         return asc;
     }
 
-    public void setAsc(boolean asc) {
+    /**
+     * 升序降序排列
+     */
+    public SQLiteInfo setAsc(boolean asc) {
         this.asc = asc;
+        return this;
     }
 
     public String getOtherCondition() {
         return otherCondition;
     }
 
-    public void setOtherCondition(String otherCondition) {
+    /**
+     * 其他语句
+     */
+    public SQLiteInfo setOtherCondition(String otherCondition) {
         this.otherCondition = otherCondition;
+        return this;
     }
 
     public SQLiteInfo addQueryCondition(ColumnInfo info) {
@@ -70,6 +78,9 @@ public class SQLiteInfo {
         return this;
     }
 
+    /**
+     * 添加排序条件
+     */
     public SQLiteInfo addOrderInfo(ColumnEnum columnName) {
         this.orderColumnList.put(columnName.getValue(), columnName);
         return this;

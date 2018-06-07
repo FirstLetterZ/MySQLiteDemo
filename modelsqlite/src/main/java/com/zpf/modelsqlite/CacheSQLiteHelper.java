@@ -40,7 +40,10 @@ public class CacheSQLiteHelper extends SQLiteOpenHelper {
                 builder.append(",").append(SQLiteConfig.COLUMN_NAME).append(column).append(str);
             }
         }
-        builder.append(")");
+        builder.append(",")
+                .append(SQLiteConfig.OTHER)
+                .append(" text")
+                .append(")");
         return builder.toString();
     }
 

@@ -21,15 +21,12 @@ public class SQLiteConfig {
     public static final int TYPE_INT = 6000;
     public static final int TYPE_STRING = 7000;
 
-    public static final String RELATION_EQUALITY = "=?";
-    public static final String RELATION_LIKE = " LIKE ?";
-    public static final String RELATION_LESS_THAN = "<?";
-    public static final String RELATION_MORE_THAN = ">?";
-    public static final String RELATION_LESS_OR_EQUAL = "<=?";
-    public static final String RELATION_MORE_OR_EQUAL = ">=?";
-    public static final String ORDER = " order by ";
-    public static final String ASC = " asc";
-    public static final String DESC = " desc";
+    public static final String ORDER = " ORDER BY ";
+    public static final String ASC = " ASC";
+    public static final String DESC = " DESC";
+    public static final String LIMIT = " LIMIT ";
+    public static final String BETWEEN = " BETWEEN ";
+    public static final String AND = " AND ";
 
     public static final int DEF_NUMBER = 0;
     public static final boolean DEF_BOOLEAN = false;

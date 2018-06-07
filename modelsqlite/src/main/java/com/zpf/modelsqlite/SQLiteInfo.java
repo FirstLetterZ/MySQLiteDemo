@@ -17,6 +17,7 @@ public class SQLiteInfo {
     private String tableName;
     private boolean asc;
     private String otherCondition;
+    private StringBuilder limitCondition = new StringBuilder();
 
     public SQLiteInfo(@NonNull String tableName) {
         this.tableName = tableName;
@@ -60,7 +61,7 @@ public class SQLiteInfo {
     }
 
     public SQLiteInfo addQueryCondition(ColumnEnum columnName, String columnValue) {
-        this.queryInfoList.add(new ColumnInfo(columnName, SQLiteConfig.RELATION_EQUALITY, columnValue));
+        this.queryInfoList.add(new ColumnInfo(columnName, SQLiteRelation.RELATION_EQUALITY, columnValue));
         return this;
     }
 

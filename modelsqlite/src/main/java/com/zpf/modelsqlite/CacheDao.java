@@ -151,7 +151,7 @@ public class CacheDao {
                 sql.append(",");
             }
             sql.append(SQLiteConfig.COLUMN_NAME).append(info.getChangeValueList().get(i).getColumnName().getValue())
-                    .append(SQLiteConfig.RELATION_EQUALITY);
+                    .append(SQLiteRelation.RELATION_EQUALITY);
             bindArgs[i] = toString(info.getChangeValueList().get(i).getColumnValue());
         }
         sql.append(WHERE);
@@ -366,7 +366,7 @@ public class CacheDao {
                 field.setAccessible(true);
                 try {
                     Object value = field.get(model);
-                    info.getQueryInfoList().add(new ColumnInfo(note.column(), SQLiteConfig.RELATION_EQUALITY, value));
+                    info.getQueryInfoList().add(new ColumnInfo(note.column(), SQLiteRelation.RELATION_EQUALITY, value));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } finally {
@@ -387,7 +387,7 @@ public class CacheDao {
                 field.setAccessible(true);
                 try {
                     Object value = field.get(model);
-                    info.getChangeValueList().add(new ColumnInfo(note.column(), "", value));
+                    info.getChangeValueList().add(new ColumnInfo(note.column(), value));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } finally {
@@ -409,7 +409,7 @@ public class CacheDao {
         whereArg[index] = info.getTableName();
         for (int i = 0; i < info.getQueryInfoList().size(); i++) {
             if (checkRelation(info.getQueryInfoList().get(i).getRelation())) {
-                builder.append(" AND ")
+                builder.append(SQLiteConfig.AND)
                         .append(SQLiteConfig.COLUMN_NAME)
                         .append(info.getQueryInfoList().get(i).getColumnName().getValue())
                         .append(info.getQueryInfoList().get(i).getRelation());
@@ -445,12 +445,12 @@ public class CacheDao {
      */
     private boolean checkRelation(String relation) {
         return (!TextUtils.isEmpty(relation))
-                && (SQLiteConfig.RELATION_EQUALITY.equals(relation)
-                || SQLiteConfig.RELATION_MORE_THAN.equals(relation)
-                || SQLiteConfig.RELATION_MORE_OR_EQUAL.equals(relation)
-                || SQLiteConfig.RELATION_LESS_THAN.equals(relation)
-                || SQLiteConfig.RELATION_LESS_OR_EQUAL.equals(relation)
-                || SQLiteConfig.RELATION_LIKE.equals(relation));
+                && (SQLiteRelation.RELATION_EQUALITY.equals(relation)
+                || SQLiteRelation.RELATION_MORE_THAN.equals(relation)
+                || SQLiteRelation.RELATION_MORE_OR_EQUAL.equals(relation)
+                || SQLiteRelation.RELATION_LESS_THAN.equals(relation)
+                || SQLiteRelation.RELATION_LESS_OR_EQUAL.equals(relation)
+                || SQLiteRelation.RELATION_LIKE.equals(relation));
     }
 
     /**

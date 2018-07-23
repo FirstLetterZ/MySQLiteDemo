@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 27
@@ -20,48 +19,10 @@ android {
     lintOptions {
         abortOnError false
     }
-    productFlavors {
-    }
 }
-
-task clearJar(type: Delete) {
-    delete 'build/outputs/ModleSQLite.jar'
-}
-//获取到需要到处的文件
-def releaseJar = file('build/intermediates/intermediate-jars/debug/classes.jar')
-
-task makeJar(type: Jar) {
-    baseName 'ModleSQLite'
-    //从哪里打包class文件 路径默认打包到build/libs
-    from  zipTree(releaseJar)
-    //去掉不需要打包的目录和文件
-    exclude('test/', 'BuildConfig.class', 'R.class')
-    //去掉R$开头的文件
-    exclude { it.name.startsWith('R$') }
-
-//    delete 'build/libs/ModleSQLite.jar'
-    //AS2.0
-//    from('build/intermediates/bundles/release/')
-//    into('build/libs/')
-    //AS3.0
-//    from('build/intermediates/intermediate-jars/debug/')
-//    into('build/outputs/')
-//    include('classes.jar')
-//    rename('classes.jar', 'ModleSQLite.jar')
-}
-
-makeJar.dependsOn(build)//gradlew makeJar
 
 dependencies {
     compile 'com.android.support:support-annotations:27.1.1'
 }
 
-publish {
-    repoName = "MyMaven"              //仓库名
-    userOrg = 'LetterZ'             //bintray注册的用户名
-    groupId = 'com.zpf'
-    artifactId = 'modelsqlite'
-    publishVersion = '1.0.0'        //compile引用时的第3部分版本号
-    desc = 'model--sqlite'          //项目描述
-    website = 'https://github.com/FirstLetterZ/MySQLiteDemo.git'   //github 托管地址
-}
+apply from: "bintrayUpload.gradle"

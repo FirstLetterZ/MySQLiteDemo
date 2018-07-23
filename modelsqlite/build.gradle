@@ -57,7 +57,7 @@ dependencies {
 }
 
 publish {
-    repoName = "maven"              //仓库名
+    repoName = "MyMaven"              //仓库名
     userOrg = 'LetterZ'             //bintray注册的用户名
     groupId = 'com.zpf'
     artifactId = 'modelsqlite'

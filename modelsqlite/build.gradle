@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 27
@@ -53,4 +54,14 @@ makeJar.dependsOn(build)//gradlew makeJar
 
 dependencies {
     compile 'com.android.support:support-annotations:27.1.1'
+}
+
+publish {
+    repoName = "maven"              //仓库名
+    userOrg = 'LetterZ'             //bintray注册的用户名
+    groupId = 'com.zpf'
+    artifactId = 'modelsqlite'
+    publishVersion = '1.0.0'        //compile引用时的第3部分版本号
+    desc = 'model--sqlite'          //项目描述
+    website = 'https://github.com/FirstLetterZ/MySQLiteDemo.git'   //github 托管地址
 }

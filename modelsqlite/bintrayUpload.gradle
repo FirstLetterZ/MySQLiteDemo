@@ -41,12 +41,12 @@ version = projectVersionName
 //}
 
 task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs //通过from函数指定代码源，这里是默认代码源
+    from android.sourceSets.main.java.srcDirs
     classifier 'sources'
 }
 
 artifacts {
-    archives javadocJar
+//    archives javadocJar
     archives sourcesJar
 }
 

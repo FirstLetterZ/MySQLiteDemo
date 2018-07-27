@@ -8,6 +8,17 @@ if (localPropertiesFile.exists()) {
     properties.load(localPropertiesFile.newDataInputStream())
 }
 
+Properties identifiable = new Properties()
+File identifiableFile = project.file('account.properties')
+if (identifiableFile.exists()) {
+    identifiable.load(identifiableFile.newDataInputStream())
+}else{
+    identifiableFile = project.file('../account.properties')
+    if (identifiableFile.exists()) {
+        identifiable.load(identifiableFile.newDataInputStream())
+    }
+}
+
 // read properties
 def projectName = properties.getProperty('project.name')
 def projectMaven = properties.getProperty('project.maven')
@@ -23,8 +34,8 @@ def developerId = properties.getProperty('developer.id')
 def developerName = properties.getProperty('developer.name')
 def developerEmail = properties.getProperty('developer.email')
 
-def bintrayUser = properties.getProperty('bintray.user')
-def bintrayApikey = properties.getProperty('bintray.apikey')
+def bintrayUser = identifiable.getProperty('bintray.user')
+def bintrayApikey = identifiable.getProperty('bintray.apikey')
 
 group = projectGroupId
 version = projectVersionName

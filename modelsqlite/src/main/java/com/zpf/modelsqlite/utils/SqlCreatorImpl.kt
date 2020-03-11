@@ -30,15 +30,17 @@ class SqlCreatorImpl private constructor() {
             result = try {
                 rawTypeClass.newInstance()
             } catch (e: Exception) {
-                Logger.e(e.toString())
+                Logger.e("newInstance-->$e")
+                null
             }
             if (result == null) {
-                try {
+                result = try {
                     val constructor = rawTypeClass.getDeclaredConstructor()
                     val args: Array<Any>? = null
                     constructor.newInstance(args)
                 } catch (e: Exception) {
-                    Logger.e(e.toString())
+                    Logger.e("constructor-->$e")
+                    null
                 }
             }
         }

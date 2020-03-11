@@ -3,11 +3,11 @@ package com.zpf.modelsqlite.retrofit
 import com.zpf.modelsqlite.*
 import com.zpf.modelsqlite.anno.additional.*
 import com.zpf.modelsqlite.anno.operation.*
-import com.zpf.modelsqlite.constant.ColumnEnum
 import com.zpf.modelsqlite.constant.SQLiteConfig
 import com.zpf.modelsqlite.interfaces.ISqlDao
 import com.zpf.modelsqlite.utils.Utils
 import com.zpf.modelsqlite.interfaces.ResultConvert
+import com.zpf.modelsqlite.utils.Logger
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -110,7 +110,7 @@ interface SqlExecutor {
 
             when (sqlMethodType) {
                 is ORIGINAL -> {
-                    if (returnType.javaClass != Unit::class.java) {
+                    if (!checkIntOrBoolOrVoid(returnType)) {
                         throw IllegalArgumentException("Does not support the returnType:$returnType")
                     }
                 }
@@ -142,17 +142,17 @@ interface SqlExecutor {
                     }
                 }
                 is DELETE -> {
-                    if (returnType !is Number && returnType.javaClass != Boolean::class.java) {
+                    if (!checkIntOrBoolOrVoid(returnType)) {
                         throw IllegalArgumentException("Does not support the returnType:$returnType")
                     }
                 }
                 is SAVE -> {
-                    if (returnType !is Number && returnType.javaClass != Boolean::class.java) {
+                    if (!checkIntOrBoolOrVoid(returnType)) {
                         throw IllegalArgumentException("Does not support the returnType:$returnType")
                     }
                 }
                 is UPDATE -> {
-                    if (returnType !is Number && returnType.javaClass != Boolean::class.java) {
+                    if (!checkIntOrBoolOrVoid(returnType)) {
                         throw IllegalArgumentException("Does not support the returnType:$returnType")
                     }
                 }
@@ -171,7 +171,7 @@ interface SqlExecutor {
                     SqlDeleteExecutor(this)
                 }
                 is SAVE -> {
-                    SqlSaveFactory(this)
+                    SqlSaveExecutor(this)
                 }
                 is UPDATE -> {
                     SqlUpdateFactory(this)
@@ -296,9 +296,30 @@ interface SqlExecutor {
 
         }
 
+        private fun checkIntOrBoolOrVoid(type: Type): Boolean {
+            return Utils.checkNumber(type) || Utils.checkBoolean(type) || Utils.checkVoid(type)
+        }
+
         private fun checkParameterType(pType: Type, targetType: Class<*>) {
-            if (targetType != String::class.java && !targetType.isAssignableFrom(pType.javaClass)) {
-                throw RuntimeException("Require type is: $targetType but get $pType.")
+            val check = when {
+                targetType == String::class.java -> {
+                    true
+                }
+                targetType == pType -> {
+                    true
+                }
+                Utils.checkNumber(targetType) -> {
+                    Utils.checkNumber(pType)
+                }
+                Utils.checkBoolean(targetType) -> {
+                    Utils.checkBoolean(pType)
+                }
+                else -> {
+                    false
+                }
+            }
+            if (!check) {
+                throw RuntimeException("Require type is $targetType but get $pType.")
             }
         }
 

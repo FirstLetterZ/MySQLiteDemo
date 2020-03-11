@@ -7,7 +7,7 @@ import com.zpf.modelsqlite.anno.operation.SAVE
 import java.lang.IllegalArgumentException
 import java.lang.reflect.Type
 
-class SqlSaveFactory(builder: SqlExecutor.Builder) : SqlExecutor {
+class SqlSaveExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
     val tableName = builder.tableName
     val transaction = builder.transaction
     private val whereList = builder.whereArgs
@@ -35,7 +35,6 @@ class SqlSaveFactory(builder: SqlExecutor.Builder) : SqlExecutor {
                         temp.queryInfoList.add(tempColumn)
                     }
                 }
-                temp.queryInfoList.addAll(whereList)
                 temp
             }
             return sqlDao.saveValue(saveValue, info)

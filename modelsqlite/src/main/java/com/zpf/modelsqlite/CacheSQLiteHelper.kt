@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.zpf.modelsqlite.constant.ColumnEnum
 import com.zpf.modelsqlite.constant.SQLiteConfig
-import com.zpf.modelsqlite.utils.Logger
 
 /**
  * 数据库构建
@@ -44,7 +43,6 @@ class CacheSQLiteHelper internal constructor(context: Context, name: String?) : 
                 .append(" text")
                 .append(")")
         val result = builder.toString()
-        Logger.i(result)
         return result
     }
 

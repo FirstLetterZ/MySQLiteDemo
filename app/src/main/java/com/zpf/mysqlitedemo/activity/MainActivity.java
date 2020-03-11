@@ -27,7 +27,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         tvTitle.setText("ModelSQLite");
         tvLeft.setVisibility(View.GONE);
-        SqlUtil.initConfig(getApplication(), "ZPF", null);
+        SqlUtil.initConfig(getApplication(), "LOG_TAG", null);
         SqlUtil.setJsonUtil(new ISqlJsonUtil() {
 
             @Override

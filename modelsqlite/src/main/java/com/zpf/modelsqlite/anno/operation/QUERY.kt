@@ -10,6 +10,6 @@ package com.zpf.modelsqlite.anno.operation
 annotation class QUERY(
         val table: String,//表
         val startIndex: Int = 0,
-        val endIndex: Int = 1,
+        val endIndex: Int = -1,
         val transaction: Boolean = false//开启事务
 )

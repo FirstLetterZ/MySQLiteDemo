@@ -9,6 +9,8 @@ import com.zpf.modelsqlite.interfaces.ObjCreator;
 import com.zpf.modelsqlite.utils.SqlCreatorImpl;
 import com.zpf.modelsqlite.utils.SqlJsonUtilImpl;
 
+import java.lang.reflect.Type;
+
 public class SqlUtil {
     private SqlUtil() {
     }
@@ -52,4 +54,11 @@ public class SqlUtil {
         SqlCreatorImpl.Companion.get().addTypeCreator(creator);
     }
 
+
+    public static void checkType(Type type) {
+        if (type == boolean.class) {
+
+        }
+
+    }
 }

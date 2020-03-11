@@ -31,7 +31,7 @@ class CacheDao : ISqlDao {
         } else {
             dbPath + "/" + SQLiteConfig.DB_USER_CACHE
         }
-        mSQLiteOpenHelper = CacheSQLiteHelper(SQLiteConfig.appContext!!.applicationContext, path)
+        mSQLiteOpenHelper = CacheSQLiteHelper(SQLiteConfig.appContext!!, path)
     }
 
     constructor(openHelper: SQLiteOpenHelper) {
@@ -402,7 +402,7 @@ class CacheDao : ISqlDao {
     }
 
     override fun execSqlString(sqlString: String, openTransaction: Boolean): Boolean {
-        Logger.i(sqlString)
+        Logger.i("execSqlString->$sqlString")
         return getDatabase().let {
             if (openTransaction) {
                 it.beginTransaction()

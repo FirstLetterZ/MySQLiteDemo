@@ -17,6 +17,7 @@ import com.zpf.modelsqlite.SqlColumnInfo;
 import com.zpf.modelsqlite.constant.ColumnEnum;
 import com.zpf.modelsqlite.SqlUtil;
 import com.zpf.mysqlitedemo.R;
+import com.zpf.mysqlitedemo.SqlDao;
 import com.zpf.mysqlitedemo.data.AppConfig;
 import com.zpf.mysqlitedemo.data.Group;
 import com.zpf.mysqlitedemo.data.Student;
@@ -103,15 +104,24 @@ public class DetailActivity extends BaseActivity {
                     id = etStudentId.getText().toString().trim();
                 } else {
                     tb = AppConfig.TB_GROUP;
-                    id = etStudentId.getText().toString().trim();
+                    id = etGroupId.getText().toString().trim();
                 }
                 if (TextUtils.isEmpty(id)) {
                     toast("id 不能为空");
                     return;
                 }
-                SQLiteInfo sqLiteInfo = new SQLiteInfo(tb);
-                sqLiteInfo.getQueryInfoList().add(new SqlColumnInfo(ColumnEnum.COLUMN_INT_001, id));
-                SqlUtil.getDao().delete(sqLiteInfo);
+                int targetId = Integer.parseInt(id);
+                if (AppConfig.checked) {
+                    if (isStudentType) {
+                        SqlDao.getApi().deleteStudent(targetId);
+                    } else {
+                        SqlDao.getApi().deleteGroup(targetId);
+                    }
+                } else {
+                    SQLiteInfo sqLiteInfo = new SQLiteInfo(tb);
+                    sqLiteInfo.getQueryInfoList().add(new SqlColumnInfo(ColumnEnum.COLUMN_INT_001, targetId));
+                    SqlUtil.getDao().delete(sqLiteInfo);
+                }
                 toast("已删除");
                 setResult(RESULT_OK);
                 finish();
@@ -121,20 +131,53 @@ public class DetailActivity extends BaseActivity {
         btnFind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SQLiteInfo sqLiteInfo = initQueryInfo();
-                if (isStudentType) {
-                    List<Student> studentList = SqlUtil.getDao().queryArray(Student.class, sqLiteInfo);
-                    if (studentList.size() == 0) {
-                        tvFindResult.setText("未查到结果");
+                if (AppConfig.checked) {
+                    getEditValue();
+                    Integer gId;
+                    try {
+                        gId = Integer.parseInt(groupId);
+                    } catch (NumberFormatException e) {
+                        gId = null;
+                    }
+                    if (isStudentType) {
+                        Integer sId;
+                        try {
+                            sId = Integer.parseInt(studentId);
+                        } catch (NumberFormatException e) {
+                            sId = null;
+                        }
+                        String sName = null;
+                        if (!TextUtils.isEmpty(studentName)) {
+                            sName = studentName;
+                        }
+                        Integer sAge;
+                        try {
+                            sAge = Integer.parseInt(studentAge);
+                        } catch (NumberFormatException e) {
+                            sAge = null;
+                        }
+                        Boolean sex = null;
+                        if (!TextUtils.isEmpty(studentSex)) {
+                            sex = "女".equals(studentSex);
+                        }
+                        List<Student> studentList = SqlDao.getApi().queryStudent(sId, sName, sAge, sex, gId);
+                        setResult(studentList);
                     } else {
-                        tvFindResult.setText(gson.toJson(studentList));
+                        String gName = null;
+                        if (!TextUtils.isEmpty(groupName)) {
+                            gName = groupName;
+                        }
+                        List<Group> groupList = SqlDao.getApi().queryGroup(gId, gName);
+                        setResult(groupList);
                     }
                 } else {
-                    List<Group> groupList = SqlUtil.getDao().queryArray(Group.class, sqLiteInfo);
-                    if (groupList.size() == 0) {
-                        tvFindResult.setText("未查到结果");
+                    SQLiteInfo sqLiteInfo = initQueryInfo();
+                    if (isStudentType) {
+                        List<Student> studentList = SqlUtil.getDao().queryArray(Student.class, sqLiteInfo);
+                        setResult(studentList);
                     } else {
-                        tvFindResult.setText(gson.toJson(groupList));
+                        List<Group> groupList = SqlUtil.getDao().queryArray(Group.class, sqLiteInfo);
+                        setResult(groupList);
                     }
                 }
             }
@@ -209,6 +252,13 @@ public class DetailActivity extends BaseActivity {
         }
     }
 
+    private void setResult(List<?> list) {
+        if (list == null || list.size() == 0) {
+            tvFindResult.setText("未查到结果");
+        } else {
+            tvFindResult.setText(gson.toJson(list));
+        }
+    }
 
     private void setRadioGroupEnable(RadioGroup radioGroup, boolean enable) {
         for (int i = 0; i < radioGroup.getChildCount(); i++) {
@@ -259,7 +309,8 @@ public class DetailActivity extends BaseActivity {
             return;
         }
         Group group = new Group();
-        group.setId(Integer.valueOf(groupId));
+        int gId = Integer.valueOf(groupId);
+        group.setId(gId);
         if (TextUtils.isEmpty(groupName)) {
             group.setName(null);
         } else {
@@ -284,35 +335,61 @@ public class DetailActivity extends BaseActivity {
                 return;
             }
             boolean female = "女".equals(studentSex);
-            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, Integer.parseInt(studentId));
-            Student student = SqlUtil.getDao().queryFirst(Student.class, sqLiteInfo);
-            if (student != null) {
-                toast("id=" + studentId + "的条目已存在，更新条目内容");
+            int sId = Integer.parseInt(studentId);
+            if (AppConfig.checked) {
+                Student student = SqlDao.getApi().checkStudent(sId);
+                if (student != null) {
+                    toast("id=" + studentId + "的条目已存在，更新条目内容");
+                } else {
+                    student = new Student();
+                    toast("不存在id=" + studentId + "的条目，新建条目");
+                }
+                student.setId(sId);
+                student.setFemale(female);
+                student.setAge(Integer.valueOf(studentAge));
+                student.setName(studentName);
+                student.setGroup(group);
+                result = SqlDao.getApi().saveStudent(student, sId);
             } else {
-                student = new Student();
-                toast("不存在id=" + studentId + "的条目，新建条目");
+                SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, sId);
+                Student student = SqlUtil.getDao().queryFirst(Student.class, sqLiteInfo);
+                if (student != null) {
+                    toast("id=" + studentId + "的条目已存在，更新条目内容");
+                } else {
+                    student = new Student();
+                    toast("不存在id=" + studentId + "的条目，新建条目");
+                }
+                student.setId(sId);
+                student.setFemale(female);
+                student.setAge(Integer.valueOf(studentAge));
+                student.setName(studentName);
+                student.setGroup(group);
+                result = SqlUtil.getDao().saveValue(student, sqLiteInfo);
             }
-            student.setId(Integer.valueOf(studentId));
-            student.setFemale(female);
-            student.setAge(Integer.valueOf(studentAge));
-            student.setName(studentName);
-            student.setGroup(group);
-            result = SqlUtil.getDao().saveValue(student, sqLiteInfo);
         } else {
             if (TextUtils.isEmpty(groupName)) {
                 toast("group name 不能为空");
                 return;
             }
-            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
-                    .addQueryCondition(ColumnEnum.COLUMN_INT_001, group.getId());
-            Cursor cursor = SqlUtil.getDao().queryCursor(sqLiteInfo);
-            if (cursor.getCount() > 0) {
-                toast("id=" + groupId + "的条目已存在，更新条目内容");
+            if (AppConfig.checked) {
+                if (SqlDao.getApi().checkGroup(gId)!=null) {
+                    toast("id=" + groupId + "的条目已存在，更新条目内容");
+                } else {
+                    toast("不存在id=" + groupId + "的条目，新建条目");
+                }
+                result = SqlDao.getApi().saveGroup(group, gId);
             } else {
-                toast("不存在id=" + groupId + "的条目，新建条目");
+                SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
+                        .addQueryCondition(ColumnEnum.COLUMN_INT_001, group.getId());
+                Cursor cursor = SqlUtil.getDao().queryCursor(sqLiteInfo);
+                if (cursor.getCount() > 0) {
+                    toast("id=" + groupId + "的条目已存在，更新条目内容");
+                } else {
+                    toast("不存在id=" + groupId + "的条目，新建条目");
+                }
+                cursor.close();
+                result = SqlUtil.getDao().saveValue(group, sqLiteInfo);
             }
-            cursor.close();
-            result = SqlUtil.getDao().saveValue(group, sqLiteInfo);
         }
         if (result >= 0) {
             toast("保存成功");

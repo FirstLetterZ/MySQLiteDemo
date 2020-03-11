@@ -10,7 +10,6 @@ import kotlin.collections.ArrayList
 
 object Utils {
 
-
     internal fun getAllFields(cls: Class<*>?): MutableList<Field> {
         var tempClass: Class<*>? = cls
         val fieldList: MutableList<Field> = ArrayList()
@@ -138,10 +137,48 @@ object Utils {
         }
     }
 
-
     internal val singleConvert = object : ResultConvert<Any> {
         override fun convert(resultList: List<Any>, itemType: Type): Any? {
             return resultList.getOrNull(0)
         }
     }
+
+    internal fun checkNumber(type: Type): Boolean {
+        if (type is Number) {
+            return true
+        }
+        if (type is Class<*> && type.superclass == java.lang.Number::class.java) {
+            return true
+        }
+        if (type is Class<*> && type.isPrimitive) {
+            return ("int" == type.name || "float" == type.name || "long" == type.name
+                    || "double" == type.name || "short" == type.name)
+        }
+        return false
+    }
+
+    internal fun checkBoolean(type: Type): Boolean {
+        if (type == Boolean::class.java) {
+            return true
+        }
+        if (type == java.lang.Boolean::class.java) {
+            return true
+        }
+        if (type is Class<*> && type.isPrimitive) {
+            return "boolean" == type.name
+        }
+        return false
+    }
+
+    internal fun checkVoid(type: Type): Boolean {
+        if (type == Unit::class.java) {
+            return true
+        }
+        if (type is Class<*> && type.isPrimitive) {
+            return "void" == type.name
+        }
+        return false
+    }
+
+
 }

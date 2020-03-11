@@ -4,7 +4,6 @@ import com.zpf.modelsqlite.SqlColumnInfo
 import com.zpf.modelsqlite.constant.ColumnEnum
 import com.zpf.modelsqlite.constant.SQLiteConfig
 import com.zpf.modelsqlite.constant.SQLiteRelation
-import java.lang.reflect.Type
 
 object FormatUtil {
 
@@ -31,17 +30,21 @@ object FormatUtil {
     }
 
     fun addConditionString(builder: StringBuilder, list: List<SqlColumnInfo>?, table: String) {
-        var skipFirst = false
+        var useConnector = true
         if (builder.endsWith(SQLiteConfig.WHERE)) {
             builder.append(formatString(table))
         } else if (builder.endsWith(SQLiteConfig.HAVING)) {
-            skipFirst = true
-        } else if (!builder.endsWith("$table'")) {
+            useConnector = false
+        } else if (!builder.endsWith("'$table'")) {
             builder.append(SQLiteConfig.WHERE)
                     .append(formatString(table))
         }
         list?.map {
-            skipFirst = !addConditionPart(builder, it, !skipFirst)
+            if (!useConnector) {
+                useConnector = addConditionPart(builder, it, useConnector)
+            } else {
+                addConditionPart(builder, it, useConnector)
+            }
         }
     }
 

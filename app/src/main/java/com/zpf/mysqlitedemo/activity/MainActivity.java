@@ -1,15 +1,16 @@
 package com.zpf.mysqlitedemo.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.gson.Gson;
-import com.zpf.modelsqlite.CacheInitInterface;
-import com.zpf.modelsqlite.CacheUtil;
+import com.zpf.modelsqlite.utils.ISqlJsonUtil;
+import com.zpf.modelsqlite.utils.SqlUtil;
 import com.zpf.mysqlitedemo.R;
+
+import java.lang.reflect.Type;
 
 public class MainActivity extends BaseActivity {
     private Gson gson = new Gson();
@@ -24,26 +25,19 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         tvTitle.setText("ModelSQLite");
         tvLeft.setVisibility(View.GONE);
-        CacheUtil.init(new CacheInitInterface() {
+        SqlUtil.INSTANCE.initConfig(getApplication(), "ZPF", null);
+        SqlUtil.INSTANCE.setJsonUtil(new ISqlJsonUtil() {
+
+            @Override
+            public <T> T fromJson(String json, @NonNull Type type) {
+              return   gson.fromJson(json,type);
+            }
+
+
             @NonNull
             @Override
-            public Context getContext() {
-                return getApplicationContext();
-            }
-
-            @Override
-            public String getDataBaseFolderPath() {
-                return null;
-            }
-
-            @Override
-            public String toJson(Object object) {
-                return gson.toJson(object);
-            }
-
-            @Override
-            public Object fromJson(String json, Class<?> cls) {
-                return gson.fromJson(json, cls);
+            public String toJsonString(Object obj) {
+                return gson.toJson(obj);
             }
         });
     }
@@ -56,13 +50,13 @@ public class MainActivity extends BaseActivity {
 
     public void findGroup(View view) {
         startActivity(makeIntent(DetailActivity.class)
-                .putExtra(DetailActivity.TYPE,DetailActivity.TYPE_FIND)
+                .putExtra(DetailActivity.TYPE, DetailActivity.TYPE_FIND)
                 .putExtra(DetailActivity.IS_STUDENT, false));
     }
 
     public void addGroup(View view) {
         startActivity(makeIntent(DetailActivity.class)
-                .putExtra(DetailActivity.TYPE,DetailActivity.TYPE_ADD)
+                .putExtra(DetailActivity.TYPE, DetailActivity.TYPE_ADD)
                 .putExtra(DetailActivity.IS_STUDENT, false));
 
     }
@@ -75,13 +69,13 @@ public class MainActivity extends BaseActivity {
 
     public void findStudent(View view) {
         startActivity(makeIntent(DetailActivity.class)
-                .putExtra(DetailActivity.TYPE,DetailActivity.TYPE_FIND)
+                .putExtra(DetailActivity.TYPE, DetailActivity.TYPE_FIND)
                 .putExtra(DetailActivity.IS_STUDENT, true));
     }
 
     public void addStudent(View view) {
         startActivity(makeIntent(DetailActivity.class)
-                .putExtra(DetailActivity.TYPE,DetailActivity.TYPE_ADD)
+                .putExtra(DetailActivity.TYPE, DetailActivity.TYPE_ADD)
                 .putExtra(DetailActivity.IS_STUDENT, true));
     }
 

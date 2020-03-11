@@ -1,5 +1,6 @@
 package com.zpf.mysqlitedemo.activity;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -11,9 +12,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.zpf.modelsqlite.CacheUtil;
-import com.zpf.modelsqlite.ColumnEnum;
 import com.zpf.modelsqlite.SQLiteInfo;
+import com.zpf.modelsqlite.SqlColumnInfo;
+import com.zpf.modelsqlite.constant.ColumnEnum;
+import com.zpf.modelsqlite.utils.SqlUtil;
 import com.zpf.mysqlitedemo.R;
 import com.zpf.mysqlitedemo.data.AppConfig;
 import com.zpf.mysqlitedemo.data.Group;
@@ -107,9 +109,9 @@ public class DetailActivity extends BaseActivity {
                     toast("id 不能为空");
                     return;
                 }
-                SQLiteInfo sqLiteInfo = new SQLiteInfo(tb)
-                        .addQueryCondition(ColumnEnum.COLUMN_INT_001, id);
-                CacheUtil.instance().delete(sqLiteInfo);
+                SQLiteInfo sqLiteInfo = new SQLiteInfo(tb);
+                sqLiteInfo.getQueryInfoList().add(new SqlColumnInfo(ColumnEnum.COLUMN_INT_001, id));
+                SqlUtil.INSTANCE.get().delete(sqLiteInfo);
                 toast("已删除");
                 setResult(RESULT_OK);
                 finish();
@@ -121,15 +123,15 @@ public class DetailActivity extends BaseActivity {
             public void onClick(View v) {
                 SQLiteInfo sqLiteInfo = initQueryInfo();
                 if (isStudentType) {
-                    List<Student> studentList = CacheUtil.instance().selectValueList(Student.class, sqLiteInfo);
-                    if (studentList == null || studentList.size() == 0) {
+                    List<Student> studentList = SqlUtil.INSTANCE.get().queryArray(Student.class, sqLiteInfo);
+                    if (studentList.size() == 0) {
                         tvFindResult.setText("未查到结果");
                     } else {
                         tvFindResult.setText(gson.toJson(studentList));
                     }
                 } else {
-                    List<Group> groupList = CacheUtil.instance().selectValueList(Group.class, sqLiteInfo);
-                    if (groupList == null || groupList.size() == 0) {
+                    List<Group> groupList = SqlUtil.INSTANCE.get().queryArray(Group.class, sqLiteInfo);
+                    if (groupList.size() == 0) {
                         tvFindResult.setText("未查到结果");
                     } else {
                         tvFindResult.setText(gson.toJson(groupList));
@@ -283,11 +285,12 @@ public class DetailActivity extends BaseActivity {
                 return;
             }
             boolean female = "女".equals(studentSex);
-            Student student = new Student();
             SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, studentId);
-            if (CacheUtil.instance().selectValueModel(student, sqLiteInfo)) {
+            Student student = SqlUtil.INSTANCE.get().queryFirst(Student.class, sqLiteInfo);
+            if (student != null) {
                 toast("id=" + studentId + "的条目已存在，更新条目内容");
             } else {
+                student = new Student();
                 toast("不存在id=" + studentId + "的条目，新建条目");
             }
             student.setId(Integer.valueOf(studentId));
@@ -295,16 +298,18 @@ public class DetailActivity extends BaseActivity {
             student.setAge(Integer.valueOf(studentAge));
             student.setName(studentName);
             student.setGroup(group);
-            result = CacheUtil.instance().saveValue(student, sqLiteInfo);
+            result = SqlUtil.INSTANCE.get().saveValue(student, sqLiteInfo);
         } else {
             SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
                     .addQueryCondition(ColumnEnum.COLUMN_INT_001, groupId);
-            if (CacheUtil.instance().selectValueModel(new Group(), sqLiteInfo)) {
+            Cursor cursor = SqlUtil.INSTANCE.get().queryCursor(sqLiteInfo);
+            if (cursor.getCount() > 0) {
                 toast("id=" + groupId + "的条目已存在，更新条目内容");
             } else {
                 toast("不存在id=" + groupId + "的条目，新建条目");
             }
-            result = CacheUtil.instance().saveValue(group, sqLiteInfo);
+            cursor.close();
+            result = SqlUtil.INSTANCE.get().saveValue(group, sqLiteInfo);
         }
         if (result >= 0) {
             toast("保存成功");

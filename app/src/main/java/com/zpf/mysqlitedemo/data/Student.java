@@ -3,10 +3,10 @@ package com.zpf.mysqlitedemo.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.zpf.modelsqlite.ColumnEnum;
-import com.zpf.modelsqlite.SQLiteClassify;
-import com.zpf.modelsqlite.SQLiteColumn;
-import com.zpf.modelsqlite.SQLiteRelevance;
+import com.zpf.modelsqlite.anno.SQLiteClassify;
+import com.zpf.modelsqlite.anno.SQLiteColumn;
+import com.zpf.modelsqlite.anno.SQLiteRelevance;
+import com.zpf.modelsqlite.constant.ColumnEnum;
 
 /**
  * Created by ZPF on 2018/4/29.

@@ -9,9 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zpf.modelsqlite.CacheUtil;
-import com.zpf.modelsqlite.ColumnEnum;
 import com.zpf.modelsqlite.SQLiteInfo;
+import com.zpf.modelsqlite.SqlOrderInfo;
+import com.zpf.modelsqlite.constant.ColumnEnum;
+import com.zpf.modelsqlite.utils.SqlUtil;
 import com.zpf.mysqlitedemo.R;
 import com.zpf.mysqlitedemo.data.AppConfig;
 import com.zpf.mysqlitedemo.data.Student;
@@ -73,10 +74,12 @@ public class StudentAdapter extends RecyclerView.Adapter<ListViewHolder> {
 
     public void refresh(boolean asc) {
         studentList.clear();
-        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT)
-                .addOrderInfo(ColumnEnum.COLUMN_INT_001).setAsc(asc);
-        List<Student> list = CacheUtil.instance().selectValueList(Student.class, sqLiteInfo);
-        if (list != null && list.size() > 0) {
+        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT);
+        SqlOrderInfo orderInfo =    new SqlOrderInfo();
+        orderInfo.getColumnArray().add(ColumnEnum.COLUMN_INT_001);
+        orderInfo.setAsc(asc);
+        List<Student> list = SqlUtil.INSTANCE.get().queryArray(Student.class, sqLiteInfo);
+        if (list.size() > 0) {
             studentList.addAll(list);
         }
         handler.sendEmptyMessage(0);

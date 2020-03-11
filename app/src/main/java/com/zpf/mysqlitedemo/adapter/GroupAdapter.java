@@ -9,9 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zpf.modelsqlite.CacheUtil;
-import com.zpf.modelsqlite.ColumnEnum;
 import com.zpf.modelsqlite.SQLiteInfo;
+import com.zpf.modelsqlite.SqlOrderInfo;
+import com.zpf.modelsqlite.constant.ColumnEnum;
+import com.zpf.modelsqlite.utils.SqlUtil;
 import com.zpf.mysqlitedemo.R;
 import com.zpf.mysqlitedemo.data.AppConfig;
 import com.zpf.mysqlitedemo.data.Group;
@@ -76,10 +77,13 @@ public class GroupAdapter extends RecyclerView.Adapter<ListViewHolder> {
 
     public void refresh(boolean asc) {
         groupList.clear();
-        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
-                .addOrderInfo(ColumnEnum.COLUMN_INT_001).setAsc(asc);
-        List<Group> list = CacheUtil.instance().selectValueList(Group.class, sqLiteInfo);
-        if (list != null && list.size() > 0) {
+        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP);
+        SqlOrderInfo orderInfo = new SqlOrderInfo();
+        orderInfo.getColumnArray().add(ColumnEnum.COLUMN_INT_001);
+        orderInfo.setAsc(asc);
+        sqLiteInfo.setOrderInfo(orderInfo);
+        List<Group> list =SqlUtil.INSTANCE.get().queryArray(Group.class, sqLiteInfo);
+        if ( list.size() > 0) {
             groupList.addAll(list);
         }
         handler.sendEmptyMessage(0);

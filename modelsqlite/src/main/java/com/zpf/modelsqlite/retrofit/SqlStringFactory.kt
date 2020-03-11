@@ -4,8 +4,10 @@ import com.zpf.modelsqlite.*
 import com.zpf.modelsqlite.anno.additional.*
 import com.zpf.modelsqlite.anno.operation.*
 import com.zpf.modelsqlite.constant.ColumnEnum
-import com.zpf.modelsqlite.utils.QueryResultConvertFactory
-import com.zpf.modelsqlite.utils.ResultConvert
+import com.zpf.modelsqlite.constant.SQLiteConfig
+import com.zpf.modelsqlite.interfaces.ISqlDao
+import com.zpf.modelsqlite.utils.Utils
+import com.zpf.modelsqlite.interfaces.ResultConvert
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -27,7 +29,7 @@ interface SqlExecutor {
         var transaction: Boolean = false
         var whereArgs: List<SqlColumnInfo>? = null
         var replaceMap: Map<String, Int>? = null
-        var valueMap: Map<ColumnEnum, Int>? = null
+        var valueMap: List<SqlColumnInfo>? = null
         var bodyIndex = -1
 
         var orderInfo: SqlOrderInfo? = null
@@ -115,24 +117,24 @@ interface SqlExecutor {
                 is QUERY -> {
                     if (returnType is GenericArrayType) {
                         itemType = returnType.genericComponentType
-                        queryResultConvert = QueryResultConvertFactory.arrayConvert
+                        queryResultConvert = Utils.arrayConvert
                     } else if (returnType is Class<*> && returnType.isArray) {
                         itemType = returnType.componentType!!
-                        queryResultConvert = QueryResultConvertFactory.arrayConvert
+                        queryResultConvert = Utils.arrayConvert
                     } else if (returnType is ParameterizedType) {
                         val rawType = returnType.rawType
                         itemType = returnType.actualTypeArguments.getOrNull(0) ?: Any::class.java
                         if (rawType is Class<*>) {
                             if (Set::class.java.isAssignableFrom(rawType)) {
-                                queryResultConvert = QueryResultConvertFactory.setConvert
+                                queryResultConvert = Utils.setConvert
                             } else if (List::class.java.isAssignableFrom(rawType)) {
-                                queryResultConvert = QueryResultConvertFactory.listConvert
+                                queryResultConvert = Utils.listConvert
                             } else if (Queue::class.java.isAssignableFrom(rawType)) {
-                                queryResultConvert = QueryResultConvertFactory.queueConvert
+                                queryResultConvert = Utils.queueConvert
                             }
                         }
                     } else {
-                        queryResultConvert = QueryResultConvertFactory.singleConvert
+                        queryResultConvert = Utils.singleConvert
                     }
                     if (queryResultConvert == null) {
                         //TODO 暂不支持
@@ -194,6 +196,17 @@ interface SqlExecutor {
                         if (sqlMethodType is QUERY && groupInfo != null) {
                             type = checkSqlMethodType(it, type)
                             groupInfo?.having?.let { group ->
+                                val columnType: Class<*> = when (Utils.getColumnType(it.column.value)) {
+                                    SQLiteConfig.TYPE_STRING -> String::class.java
+                                    SQLiteConfig.TYPE_INT -> Int::class.java
+                                    SQLiteConfig.TYPE_BOOLEAN -> Boolean::class.java
+                                    SQLiteConfig.TYPE_FLOAT -> Float::class.java
+                                    SQLiteConfig.TYPE_LONG -> Long::class.java
+                                    SQLiteConfig.TYPE_SHORT -> Short::class.java
+                                    SQLiteConfig.TYPE_DOUBLE -> Double::class.java
+                                    else -> String::class.java
+                                }
+                                checkParameterType(pType, columnType)
                                 val columnInfo = SqlColumnInfo(it.column, index)
                                 columnInfo.relation = it.relation
                                 columnInfo.funcName = it.sqlFunc
@@ -234,22 +247,42 @@ interface SqlExecutor {
                         }
                     }
                     is Value -> {
-                        type = checkSqlMethodType(it, type)
                         if (sqlMethodType is SAVE || sqlMethodType is UPDATE) {
                             type = checkSqlMethodType(it, type)
-                            if (valueMap == null) {
-                                valueMap = EnumMap(ColumnEnum::class.java)
+                            val columnType: Class<*> = when (Utils.getColumnType(it.column.value)) {
+                                SQLiteConfig.TYPE_STRING -> String::class.java
+                                SQLiteConfig.TYPE_INT -> Int::class.java
+                                SQLiteConfig.TYPE_BOOLEAN -> Boolean::class.java
+                                SQLiteConfig.TYPE_FLOAT -> Float::class.java
+                                SQLiteConfig.TYPE_LONG -> Long::class.java
+                                SQLiteConfig.TYPE_SHORT -> Short::class.java
+                                SQLiteConfig.TYPE_DOUBLE -> Double::class.java
+                                else -> String::class.java
                             }
-                            (valueMap as? EnumMap)?.put(it.column, index)
+                            checkParameterType(pType, columnType)
+                            if (valueMap == null) {
+                                valueMap = ArrayList()
+                            }
+                            (valueMap as? ArrayList)?.add(SqlColumnInfo(it.column, index))
                         }
                     }
                     is Where -> {
-                        type = checkSqlMethodType(it, type)
                         if (sqlMethodType !is ORIGINAL) {
                             type = checkSqlMethodType(it, type)
                             if (whereArgs == null) {
                                 whereArgs = ArrayList()
                             }
+                            val columnType: Class<*> = when (Utils.getColumnType(it.column.value)) {
+                                SQLiteConfig.TYPE_STRING -> String::class.java
+                                SQLiteConfig.TYPE_INT -> Int::class.java
+                                SQLiteConfig.TYPE_BOOLEAN -> Boolean::class.java
+                                SQLiteConfig.TYPE_FLOAT -> Float::class.java
+                                SQLiteConfig.TYPE_LONG -> Long::class.java
+                                SQLiteConfig.TYPE_SHORT -> Short::class.java
+                                SQLiteConfig.TYPE_DOUBLE -> Double::class.java
+                                else -> String::class.java
+                            }
+                            checkParameterType(pType, columnType)
                             val columnInfo = SqlColumnInfo(it.column, index)
                             columnInfo.relation = it.relation
                             columnInfo.funcName = it.sqlFunc
@@ -261,6 +294,12 @@ interface SqlExecutor {
                 }
             }
 
+        }
+
+        private fun checkParameterType(pType: Type, targetType: Class<*>) {
+            if (targetType != String::class.java && !targetType.isAssignableFrom(pType.javaClass)) {
+                throw RuntimeException("Require type is: $targetType but get $pType.")
+            }
         }
 
         private fun checkSqlMethodType(target: Annotation, current: Annotation?): Annotation {

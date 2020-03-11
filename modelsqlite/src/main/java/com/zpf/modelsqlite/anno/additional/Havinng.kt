@@ -7,7 +7,7 @@ import com.zpf.modelsqlite.constant.SQLiteRelation
  * 数据库操作限制，分组，仅在执行 @QUERY 时生效
  * Created by ZPF on 2020/3/6.
  */
-@Target(AnnotationTarget.FIELD)
+@Target(AnnotationTarget.VALUE_PARAMETER)
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 annotation class Havinng(
         val column: ColumnEnum,

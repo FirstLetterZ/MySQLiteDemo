@@ -1,4 +1,4 @@
-package com.zpf.modelsqlite
+package com.zpf.modelsqlite.interfaces
 
 import java.lang.reflect.Type
 

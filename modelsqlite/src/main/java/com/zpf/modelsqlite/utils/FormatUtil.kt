@@ -46,7 +46,7 @@ object FormatUtil {
     }
 
     fun addGroupString(builder: StringBuilder, groupColumns: List<ColumnEnum>?, havingList: List<SqlColumnInfo>?) {
-        if (!groupColumns.isNullOrEmpty()) {
+        if (groupColumns != null && groupColumns.isNotEmpty()) {
             builder.append(SQLiteConfig.GROUP)
             groupColumns.forEachIndexed { i, item ->
                 if (i > 0) {
@@ -64,7 +64,7 @@ object FormatUtil {
     }
 
     fun addOrderString(builder: StringBuilder, orderColumns: List<ColumnEnum>?, asc: Boolean) {
-        if (!orderColumns.isNullOrEmpty()) {
+        if (orderColumns != null && orderColumns.isNotEmpty()) {
             builder.append(SQLiteConfig.ORDER)
             orderColumns.forEachIndexed { i, item ->
                 if (i > 0) {
@@ -76,6 +76,8 @@ object FormatUtil {
         }
         if (asc) {
             builder.append(SQLiteConfig.ASC)
+        } else {
+            builder.append(SQLiteConfig.DESC)
         }
     }
 
@@ -84,43 +86,59 @@ object FormatUtil {
             Logger.e("Invalid arguments: offset=$offset,pageSize=$pageSize,pageNum=$pageNum")
         } else {
             val endIndex = offset + pageNum * pageSize
-            builder.append(SQLiteConfig.LIMIT + (endIndex - pageNum) + SQLiteConfig.COMMA + endIndex)
+            builder.append(SQLiteConfig.LIMIT + (endIndex - pageSize) + SQLiteConfig.COMMA + endIndex)
         }
     }
 
 
     fun addUpdateString(builder: StringBuilder, valueList: List<SqlColumnInfo>?) {
-        if (!valueList.isNullOrEmpty()) {
-            valueList.forEachIndexed { i, item ->
-                if (i > 0) {
-                    builder.append(SQLiteConfig.COMMA)
-                }
-                builder.append(SQLiteConfig.COLUMN_NAME)
-                        .append(item.columnName.value)
-                        .append(SQLiteRelation.RELATION_EQUALITY.value)
-                        .append(formatString(item.columnValue))
-            }
-            builder.append(SQLiteConfig.COMMA)
-                    .append(SQLiteConfig.TIME_UPDATE)
+        if (valueList != null && valueList.isNotEmpty()) {
+            builder.append(SQLiteConfig.TIME_UPDATE)
                     .append(SQLiteRelation.RELATION_EQUALITY.value)
                     .append(System.currentTimeMillis())
+            valueList.map { item ->
+                if (item.columnValue == null) {
+                    if (!item.ignoreOnNull) {
+                        builder.append(SQLiteConfig.COMMA)
+                                .append(SQLiteConfig.COLUMN_NAME)
+                                .append(item.columnName.value)
+                                .append(SQLiteRelation.RELATION_EQUALITY.value)
+                                .append(Utils.getDefaultValue(item.columnName))
+                    } else {
+                        //
+                    }
+                } else {
+                    builder.append(SQLiteConfig.COMMA)
+                            .append(SQLiteConfig.COLUMN_NAME)
+                            .append(item.columnName.value)
+                            .append(SQLiteRelation.RELATION_EQUALITY.value)
+                            .append(formatString(item.columnValue))
+                }
+            }
         }
     }
 
     fun addInsertString(builder: StringBuilder, valueList: List<SqlColumnInfo>?, table: String) {
-        if (!valueList.isNullOrEmpty()) {
+        if (valueList != null && valueList.isNotEmpty()) {
             if (!builder.endsWith(SQLiteConfig.FIRST_KEY_WORD)) {
                 builder.append(SQLiteConfig.FIRST_KEY_WORD)
             }
             val bindArgs = StringBuilder(SQLiteConfig.VALUES)
             bindArgs.append(formatString(table))
             valueList.map {
-                builder.append(SQLiteConfig.COMMA)
-                        .append(SQLiteConfig.COLUMN_NAME)
-                        .append(it.columnName.value)
-                bindArgs.append(SQLiteConfig.COMMA)
-                        .append(formatString(it.columnValue))
-
+                if (it.columnValue == null) {
+                    builder.append(SQLiteConfig.COMMA)
+                            .append(SQLiteConfig.COLUMN_NAME)
+                            .append(it.columnName.value)
+                    bindArgs.append(SQLiteConfig.COMMA)
+                            .append(Utils.getDefaultValue(it.columnName))
+                } else {
+                    builder.append(SQLiteConfig.COMMA)
+                            .append(SQLiteConfig.COLUMN_NAME)
+                            .append(it.columnName.value)
+                    bindArgs.append(SQLiteConfig.COMMA)
+                            .append(formatString(it.columnValue))
+                }
             }
             builder.append(SQLiteConfig.COMMA)
                     .append(SQLiteConfig.TIME_CREATE)
@@ -135,17 +153,14 @@ object FormatUtil {
         }
     }
 
-    internal fun formatString(any: Any?): String {
+    private fun formatString(any: Any?): String {
         if (any == null) {
             return ""
         } else if (any is Number) {
             return any.toString()
         } else {
-            return "'" + SqlUtil.defJsonUtil.toJsonString(any) + "'"
+            return "'" + SqlJsonUtilImpl.get().toJsonString(any) + "'"
         }
-
     }
-
-    internal fun <T> fromJson(json: String?, type: Type): T? = SqlUtil.defJsonUtil.fromJson(json, type)
 
 }

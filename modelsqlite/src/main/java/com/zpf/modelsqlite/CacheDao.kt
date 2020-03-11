@@ -9,10 +9,8 @@ import com.zpf.modelsqlite.anno.SQLiteColumn
 import com.zpf.modelsqlite.anno.SQLiteRelevance
 import com.zpf.modelsqlite.constant.ColumnEnum
 import com.zpf.modelsqlite.constant.SQLiteConfig
-import com.zpf.modelsqlite.utils.FormatUtil
-import com.zpf.modelsqlite.utils.Logger
-import com.zpf.modelsqlite.utils.SqlUtil
-import com.zpf.modelsqlite.utils.Utils
+import com.zpf.modelsqlite.interfaces.ISqlDao
+import com.zpf.modelsqlite.utils.*
 import java.lang.reflect.Type
 import kotlin.collections.ArrayList
 
@@ -186,7 +184,9 @@ class CacheDao : ISqlDao {
             FormatUtil.addOrderString(sql, it.columnArray, it.asc)
         }
         info.limitInfo?.let {
-            FormatUtil.addLimitString(sql, it.offset, it.pageSize, it.pageNumber)
+            if (it.pageSize > 0 && it.pageNumber > 0) {
+                FormatUtil.addLimitString(sql, it.offset, it.pageSize, it.pageNumber)
+            }
         }
         val sqkString = sql.toString()
         Logger.i(sqkString)
@@ -213,7 +213,7 @@ class CacheDao : ISqlDao {
      * 单条查询第一条符合条件的结果
      */
     override fun <T> queryFirst(type: Type, info: SQLiteInfo): T? {
-        val value = SqlUtil.newInstance(type) as? T
+        val value: T? = SqlCreatorImpl.get().newInstance(type)
         if (value != null) {
             val cursor = queryCursor(info)
             if (cursor.moveToFirst()) {
@@ -231,7 +231,7 @@ class CacheDao : ISqlDao {
         val list = ArrayList<T>()
         val cursor = queryCursor(info)
         while (cursor.moveToNext()) {
-            val listValue: T? = SqlUtil.newInstance(type) as? T
+            val listValue: T? = SqlCreatorImpl.get().newInstance(type)
             if (listValue == null) {
                 break
             } else {
@@ -308,7 +308,7 @@ class CacheDao : ISqlDao {
                     val value = getValueByCursor(cursor, note.column)
                     if (value != null && value is String
                             && field.type != String::class.java) {
-                        val newValue: Any? = FormatUtil.fromJson(value.toString(), field.type)
+                        val newValue: Any? = SqlJsonUtilImpl.get().fromJson(value.toString(), field.type)
                         field[receiver] = newValue
                     } else {
                         field[receiver] = value

@@ -1,11 +1,19 @@
 package com.zpf.modelsqlite.utils
 
+import com.zpf.modelsqlite.interfaces.ISqlJsonUtil
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.math.BigDecimal
 
-class SqlJsonUtilImpl : ISqlJsonUtil {
+class SqlJsonUtilImpl private constructor() : ISqlJsonUtil {
+
+    companion object {
+        private val impl = SqlJsonUtilImpl()
+        fun get(): SqlJsonUtilImpl {
+            return impl
+        }
+    }
 
     private var realJsonUtil: ISqlJsonUtil? = null
 
@@ -22,6 +30,13 @@ class SqlJsonUtilImpl : ISqlJsonUtil {
             }
             is Number -> {
                 obj.toString()
+            }
+            is Boolean -> {
+                if (obj) {
+                    "1"
+                } else {
+                    "0"
+                }
             }
             is JSONObject -> {
                 obj.toString()

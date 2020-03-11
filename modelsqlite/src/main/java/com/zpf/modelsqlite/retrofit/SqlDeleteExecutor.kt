@@ -1,6 +1,6 @@
 package com.zpf.modelsqlite.retrofit
 
-import com.zpf.modelsqlite.ISqlDao
+import com.zpf.modelsqlite.interfaces.ISqlDao
 import com.zpf.modelsqlite.SQLiteInfo
 import com.zpf.modelsqlite.SqlColumnInfo
 import com.zpf.modelsqlite.anno.operation.DELETE

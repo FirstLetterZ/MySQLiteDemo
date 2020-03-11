@@ -1,7 +1,7 @@
 package com.zpf.modelsqlite.retrofit
 
-import com.zpf.modelsqlite.ISqlDao
-import com.zpf.modelsqlite.utils.FormatUtil
+import com.zpf.modelsqlite.interfaces.ISqlDao
+import com.zpf.modelsqlite.utils.SqlJsonUtilImpl
 import java.lang.reflect.Type
 
 class SqlMethodHandler(private val factory: SqlExecutor, private val type: Type) {
@@ -38,7 +38,7 @@ class SqlMethodHandler(private val factory: SqlExecutor, private val type: Type)
                 return true
             }
         } else if (type is CharSequence) {
-            return FormatUtil.formatString(result)
+            return SqlJsonUtilImpl.get().toJsonString(result)
         } else {
             return result
         }

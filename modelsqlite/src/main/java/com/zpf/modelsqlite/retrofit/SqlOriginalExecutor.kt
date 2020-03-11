@@ -1,8 +1,8 @@
 package com.zpf.modelsqlite.retrofit
 
-import com.zpf.modelsqlite.ISqlDao
+import com.zpf.modelsqlite.interfaces.ISqlDao
 import com.zpf.modelsqlite.anno.operation.ORIGINAL
-import com.zpf.modelsqlite.utils.FormatUtil
+import com.zpf.modelsqlite.utils.SqlJsonUtilImpl
 import java.lang.reflect.Type
 
 class SqlOriginalExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
@@ -14,7 +14,7 @@ class SqlOriginalExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
         val result = sqlString
         var newValue: String
         replaceMap?.map {
-            newValue = FormatUtil.formatString(it.value)
+            newValue = SqlJsonUtilImpl.get().toJsonString(it.value)
             result.replace("{${it.key}}", newValue)
         }
         return sqlDao.execSqlString(result, transaction)

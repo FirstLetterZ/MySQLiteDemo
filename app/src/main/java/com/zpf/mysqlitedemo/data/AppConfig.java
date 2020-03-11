@@ -5,6 +5,7 @@ package com.zpf.mysqlitedemo.data;
  */
 
 public class AppConfig {
-    public static final String TB_STUDENT ="student" ;
-    public static final String TB_GROUP ="group" ;
+    public static final String TB_STUDENT = "student";
+    public static final String TB_GROUP = "group";
+    public static boolean checked = false;
 }

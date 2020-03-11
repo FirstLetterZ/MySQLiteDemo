@@ -2,9 +2,11 @@ package com.zpf.modelsqlite.utils
 
 import com.zpf.modelsqlite.constant.ColumnEnum
 import com.zpf.modelsqlite.constant.SQLiteConfig
+import com.zpf.modelsqlite.interfaces.ResultConvert
 import java.lang.reflect.*
 import java.lang.reflect.Array
 import java.util.*
+import kotlin.collections.ArrayList
 
 object Utils {
 
@@ -71,7 +73,7 @@ object Utils {
         }
     }
 
-    fun hasUnresolvableType(type: Type?): Boolean {
+    internal fun hasUnresolvableType(type: Type?): Boolean {
         if (type is Class<*>) {
             return false
         }
@@ -97,4 +99,49 @@ object Utils {
                 + "GenericArrayType, but <" + type + "> is of type " + className)
     }
 
+
+    internal val setConvert = object : ResultConvert<Any> {
+        override fun convert(resultList: List<Any>, itemType: Type): Set<Any> {
+            val set = LinkedHashSet<Any>()
+            resultList.map {
+                set.add(it)
+            }
+            return set
+        }
+    }
+
+
+    internal val queueConvert = object : ResultConvert<Any> {
+        override fun convert(resultList: List<Any>, itemType: Type): Queue<Any> {
+            val queue = ArrayDeque<Any>()
+            resultList.map {
+                queue.add(it)
+            }
+            return queue
+        }
+    }
+
+
+    internal val listConvert = object : ResultConvert<Any> {
+        override fun convert(resultList: List<Any>, itemType: Type): List<Any> {
+            return resultList
+        }
+    }
+
+    internal val arrayConvert = object : ResultConvert<Any> {
+        override fun convert(resultList: List<Any>, itemType: Type): kotlin.Array<Any> {
+            val array = Array.newInstance(itemType.javaClass, resultList.size)
+            resultList.forEachIndexed { i, item ->
+                Array.set(array, i, item)
+            }
+            return array as kotlin.Array<Any>
+        }
+    }
+
+
+    internal val singleConvert = object : ResultConvert<Any> {
+        override fun convert(resultList: List<Any>, itemType: Type): Any? {
+            return resultList.getOrNull(0)
+        }
+    }
 }

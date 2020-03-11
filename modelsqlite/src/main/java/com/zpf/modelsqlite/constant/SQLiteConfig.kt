@@ -1,6 +1,7 @@
 package com.zpf.modelsqlite.constant
 
 import android.app.Application
+import android.content.pm.ApplicationInfo
 
 /**
  * 数据可辅助常量
@@ -50,4 +51,13 @@ object SQLiteConfig {
     internal var appContext: Application? = null
     internal var LOG_TAG = "ModelSQLite"
     internal var DEBUG = false
+
+    internal fun initConfig(app: Application, tag: String?, dbPath: String?) {
+        DEBUG = (app.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (tag != null && tag.isNotEmpty()) {
+            LOG_TAG = tag
+        }
+        appContext = app
+        DB_PATH = dbPath
+    }
 }

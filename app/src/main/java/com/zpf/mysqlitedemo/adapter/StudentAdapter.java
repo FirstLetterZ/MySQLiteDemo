@@ -12,8 +12,9 @@ import android.view.ViewGroup;
 import com.zpf.modelsqlite.SQLiteInfo;
 import com.zpf.modelsqlite.SqlOrderInfo;
 import com.zpf.modelsqlite.constant.ColumnEnum;
-import com.zpf.modelsqlite.utils.SqlUtil;
+import com.zpf.modelsqlite.SqlUtil;
 import com.zpf.mysqlitedemo.R;
+import com.zpf.mysqlitedemo.SqlDao;
 import com.zpf.mysqlitedemo.data.AppConfig;
 import com.zpf.mysqlitedemo.data.Student;
 
@@ -52,16 +53,16 @@ public class StudentAdapter extends RecyclerView.Adapter<ListViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
         holder.tvType.setText("Student");
-        holder.tvId.setText(""+studentList.get(position).getId());
+        holder.tvId.setText("" + studentList.get(position).getId());
         holder.tvName.setText(studentList.get(position).getName());
-        holder.tvAge.setText(""+studentList.get(position).getAge());
+        holder.tvAge.setText("" + studentList.get(position).getAge());
         holder.tvSex.setText(studentList.get(position).isFemale() ? "女" : "男");
-        final int n=position;
+        final int n = position;
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(itemClickListener!=null){
-                    itemClickListener.OnItemClick(n,studentList.get(n));
+                if (itemClickListener != null) {
+                    itemClickListener.OnItemClick(n, studentList.get(n));
                 }
             }
         });
@@ -74,12 +75,22 @@ public class StudentAdapter extends RecyclerView.Adapter<ListViewHolder> {
 
     public void refresh(boolean asc) {
         studentList.clear();
-        SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT);
-        SqlOrderInfo orderInfo =    new SqlOrderInfo();
-        orderInfo.getColumnArray().add(ColumnEnum.COLUMN_INT_001);
-        orderInfo.setAsc(asc);
-        List<Student> list = SqlUtil.INSTANCE.get().queryArray(Student.class, sqLiteInfo);
-        if (list.size() > 0) {
+        List<Student> list;
+        if (AppConfig.checked) {
+            if (asc) {
+                list = SqlDao.getApi().queryAllStudentsAsc();
+            } else {
+                list = SqlDao.getApi().queryAllStudentsDesc();
+            }
+        } else {
+            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT);
+            SqlOrderInfo orderInfo = new SqlOrderInfo();
+            orderInfo.getColumnArray().add(ColumnEnum.COLUMN_INT_001);
+            orderInfo.setAsc(asc);
+            sqLiteInfo.setOrderInfo(orderInfo);
+            list = SqlUtil.getDao().queryArray(Student.class, sqLiteInfo);
+        }
+        if (list != null && list.size() > 0) {
             studentList.addAll(list);
         }
         handler.sendEmptyMessage(0);
@@ -102,6 +113,6 @@ public class StudentAdapter extends RecyclerView.Adapter<ListViewHolder> {
     }
 
     public interface OnItemClickListener {
-        void OnItemClick(int position,Student student);
+        void OnItemClick(int position, Student student);
     }
 }

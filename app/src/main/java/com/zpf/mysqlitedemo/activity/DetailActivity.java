@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.zpf.modelsqlite.SQLiteInfo;
 import com.zpf.modelsqlite.SqlColumnInfo;
 import com.zpf.modelsqlite.constant.ColumnEnum;
-import com.zpf.modelsqlite.utils.SqlUtil;
+import com.zpf.modelsqlite.SqlUtil;
 import com.zpf.mysqlitedemo.R;
 import com.zpf.mysqlitedemo.data.AppConfig;
 import com.zpf.mysqlitedemo.data.Group;
@@ -111,7 +111,7 @@ public class DetailActivity extends BaseActivity {
                 }
                 SQLiteInfo sqLiteInfo = new SQLiteInfo(tb);
                 sqLiteInfo.getQueryInfoList().add(new SqlColumnInfo(ColumnEnum.COLUMN_INT_001, id));
-                SqlUtil.INSTANCE.get().delete(sqLiteInfo);
+                SqlUtil.getDao().delete(sqLiteInfo);
                 toast("已删除");
                 setResult(RESULT_OK);
                 finish();
@@ -123,14 +123,14 @@ public class DetailActivity extends BaseActivity {
             public void onClick(View v) {
                 SQLiteInfo sqLiteInfo = initQueryInfo();
                 if (isStudentType) {
-                    List<Student> studentList = SqlUtil.INSTANCE.get().queryArray(Student.class, sqLiteInfo);
+                    List<Student> studentList = SqlUtil.getDao().queryArray(Student.class, sqLiteInfo);
                     if (studentList.size() == 0) {
                         tvFindResult.setText("未查到结果");
                     } else {
                         tvFindResult.setText(gson.toJson(studentList));
                     }
                 } else {
-                    List<Group> groupList = SqlUtil.INSTANCE.get().queryArray(Group.class, sqLiteInfo);
+                    List<Group> groupList = SqlUtil.getDao().queryArray(Group.class, sqLiteInfo);
                     if (groupList.size() == 0) {
                         tvFindResult.setText("未查到结果");
                     } else {
@@ -258,14 +258,13 @@ public class DetailActivity extends BaseActivity {
             toast("group id 不能为空");
             return;
         }
-
-        if (TextUtils.isEmpty(groupId)) {
-            toast("group name 不能为空");
-            return;
-        }
         Group group = new Group();
         group.setId(Integer.valueOf(groupId));
-        group.setName(groupName);
+        if (TextUtils.isEmpty(groupName)) {
+            group.setName(null);
+        } else {
+            group.setName(groupName);
+        }
         int result;
         if (isStudentType) {
             if (TextUtils.isEmpty(studentId)) {
@@ -285,8 +284,8 @@ public class DetailActivity extends BaseActivity {
                 return;
             }
             boolean female = "女".equals(studentSex);
-            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, studentId);
-            Student student = SqlUtil.INSTANCE.get().queryFirst(Student.class, sqLiteInfo);
+            SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, Integer.parseInt(studentId));
+            Student student = SqlUtil.getDao().queryFirst(Student.class, sqLiteInfo);
             if (student != null) {
                 toast("id=" + studentId + "的条目已存在，更新条目内容");
             } else {
@@ -298,18 +297,22 @@ public class DetailActivity extends BaseActivity {
             student.setAge(Integer.valueOf(studentAge));
             student.setName(studentName);
             student.setGroup(group);
-            result = SqlUtil.INSTANCE.get().saveValue(student, sqLiteInfo);
+            result = SqlUtil.getDao().saveValue(student, sqLiteInfo);
         } else {
+            if (TextUtils.isEmpty(groupName)) {
+                toast("group name 不能为空");
+                return;
+            }
             SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
-                    .addQueryCondition(ColumnEnum.COLUMN_INT_001, groupId);
-            Cursor cursor = SqlUtil.INSTANCE.get().queryCursor(sqLiteInfo);
+                    .addQueryCondition(ColumnEnum.COLUMN_INT_001, group.getId());
+            Cursor cursor = SqlUtil.getDao().queryCursor(sqLiteInfo);
             if (cursor.getCount() > 0) {
                 toast("id=" + groupId + "的条目已存在，更新条目内容");
             } else {
                 toast("不存在id=" + groupId + "的条目，新建条目");
             }
             cursor.close();
-            result = SqlUtil.INSTANCE.get().saveValue(group, sqLiteInfo);
+            result = SqlUtil.getDao().saveValue(group, sqLiteInfo);
         }
         if (result >= 0) {
             toast("保存成功");

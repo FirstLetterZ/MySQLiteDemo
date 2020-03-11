@@ -7,7 +7,7 @@ import com.zpf.modelsqlite.constant.SQLiteRelation
  * 数据库操作条件注解
  * Created by ZPF on 2020/3/6.
  */
-@Target(AnnotationTarget.FIELD)
+@Target(AnnotationTarget.VALUE_PARAMETER)
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 annotation class Where(
         val column: ColumnEnum,

@@ -1,6 +1,7 @@
-package com.zpf.modelsqlite
+package com.zpf.modelsqlite.interfaces
 
 import android.database.Cursor
+import com.zpf.modelsqlite.SQLiteInfo
 import com.zpf.modelsqlite.constant.ColumnEnum
 import java.lang.reflect.Type
 

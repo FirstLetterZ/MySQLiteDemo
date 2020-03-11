@@ -2,7 +2,8 @@ package com.zpf.modelsqlite.retrofit
 
 import com.zpf.modelsqlite.*
 import com.zpf.modelsqlite.anno.operation.QUERY
-import com.zpf.modelsqlite.utils.ResultConvert
+import com.zpf.modelsqlite.interfaces.ISqlDao
+import com.zpf.modelsqlite.interfaces.ResultConvert
 import java.lang.reflect.Type
 
 class SqlQueryExecutor(builder: SqlExecutor.Builder, private val type: Type,
@@ -49,18 +50,20 @@ class SqlQueryExecutor(builder: SqlExecutor.Builder, private val type: Type,
             sqlInfo.orderInfo?.asc = it.asc
         }
         if (limitInfo != null) {
-            val pageInfo = limitInfo.copy()
-            pageInfo.pageNumber = 1
-            if (pageInfoIndex >= 0) {
-                value = args?.getOrNull(pageInfoIndex)
-                if (value is Number) {
-                    pageInfo.pageNumber = (value as Number).toInt()
+            if (limitInfo.pageSize > 0 && limitInfo.pageNumber > 0) {
+                val pageInfo = limitInfo.copy()
+                pageInfo.pageNumber = 1
+                if (pageInfoIndex >= 0) {
+                    value = args?.getOrNull(pageInfoIndex)
+                    if (value is Number) {
+                        pageInfo.pageNumber = (value as Number).toInt()
+                    }
                 }
+                sqlInfo.limitInfo = pageInfo
             }
-            sqlInfo.limitInfo = pageInfo
         }
         sqlInfo.transaction = transaction
-        return queryResultConvert.convert(sqlDao.queryArray(type, sqlInfo),type)
+        return queryResultConvert.convert(sqlDao.queryArray(type, sqlInfo), type)
     }
 
     override fun methodType(): Type = QUERY::class.java

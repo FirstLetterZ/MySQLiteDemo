@@ -1,12 +1,12 @@
 package com.zpf.modelsqlite.retrofit
 
-import com.zpf.modelsqlite.utils.SqlUtil
+import com.zpf.modelsqlite.SqlUtil
 import com.zpf.modelsqlite.utils.Utils
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
 
-class SqlRetrofit {
+object SqlRetrofit {
     private val handlerCache = ConcurrentHashMap<Method, SqlMethodHandler>()
 
     fun <T> create(service: Class<T>): T? {
@@ -15,7 +15,7 @@ class SqlRetrofit {
         }
         return Proxy.newProxyInstance(service.classLoader, arrayOf<Class<*>?>(service)
         ) { _, method, args ->
-            getSqlMethodHandler(method)?.invoke(SqlUtil.get(), args)
+            getSqlMethodHandler(method)?.invoke(SqlUtil.getDao(), args)
         } as? T
     }
 

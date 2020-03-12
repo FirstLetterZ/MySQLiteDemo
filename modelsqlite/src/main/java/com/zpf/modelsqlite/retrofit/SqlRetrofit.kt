@@ -1,6 +1,7 @@
 package com.zpf.modelsqlite.retrofit
 
 import com.zpf.modelsqlite.SqlUtil
+import com.zpf.modelsqlite.constant.SQLiteConfig
 import com.zpf.modelsqlite.utils.Logger
 import com.zpf.modelsqlite.utils.SqlJsonUtilImpl
 import com.zpf.modelsqlite.utils.Utils
@@ -18,7 +19,9 @@ object SqlRetrofit {
         return Proxy.newProxyInstance(service.classLoader, arrayOf<Class<*>?>(service)
         ) { _, method, args ->
             val re = getSqlMethodHandler(method)?.invoke(SqlUtil.getDao(), args)
-            Logger.i("onProxy: " + SqlJsonUtilImpl.get().toJsonString(re))
+            if(SQLiteConfig.DEBUG) {
+                Logger.i("onProxy: " + SqlJsonUtilImpl.get().toJsonString(re))
+            }
             re
         } as? T
     }

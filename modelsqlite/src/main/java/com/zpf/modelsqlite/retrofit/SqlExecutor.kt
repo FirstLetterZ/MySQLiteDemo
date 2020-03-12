@@ -7,7 +7,6 @@ import com.zpf.modelsqlite.constant.SQLiteConfig
 import com.zpf.modelsqlite.interfaces.ISqlDao
 import com.zpf.modelsqlite.utils.Utils
 import com.zpf.modelsqlite.interfaces.ResultConvert
-import com.zpf.modelsqlite.utils.Logger
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType

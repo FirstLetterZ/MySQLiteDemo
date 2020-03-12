@@ -19,7 +19,7 @@ object SqlRetrofit {
         return Proxy.newProxyInstance(service.classLoader, arrayOf<Class<*>?>(service)
         ) { _, method, args ->
             val re = getSqlMethodHandler(method)?.invoke(SqlUtil.getDao(), args)
-            if(SQLiteConfig.DEBUG) {
+            if(SQLiteConfig.isDebug()) {
                 Logger.i("onProxy: " + SqlJsonUtilImpl.get().toJsonString(re))
             }
             re

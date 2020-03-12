@@ -42,8 +42,7 @@ class CacheSQLiteHelper internal constructor(context: Context, name: String?) : 
                 .append(SQLiteConfig.OTHER)
                 .append(" text")
                 .append(")")
-        val result = builder.toString()
-        return result
+        return builder.toString()
     }
 
     private fun getColumnType(column: Int): String? {

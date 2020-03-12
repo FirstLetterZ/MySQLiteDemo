@@ -31,7 +31,7 @@ class CacheDao : ISqlDao {
         } else {
             dbPath + "/" + SQLiteConfig.DB_USER_CACHE
         }
-        mSQLiteOpenHelper = CacheSQLiteHelper(SQLiteConfig.appContext!!, path)
+        mSQLiteOpenHelper = CacheSQLiteHelper(SQLiteConfig.getAppContext(), path)
     }
 
     constructor(openHelper: SQLiteOpenHelper) {

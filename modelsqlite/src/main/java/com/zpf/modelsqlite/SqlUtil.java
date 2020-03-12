@@ -16,14 +16,14 @@ public class SqlUtil {
     private static volatile CacheDao defSqlDao;
 
     public static void initConfig(Application app, String tag, String dbPath) {
-        SQLiteConfig.INSTANCE.initConfig(app, tag, dbPath);
+        SQLiteConfig.initConfig(app, tag, dbPath);
     }
 
     public static CacheDao getDao() {
         if (defSqlDao == null) {
             synchronized (SqlUtil.class) {
                 if (defSqlDao == null) {
-                    defSqlDao = new CacheDao(SQLiteConfig.INSTANCE.getDB_PATH$modelsqlite_debug());
+                    defSqlDao = new CacheDao(SQLiteConfig.DB_PATH);
                 }
             }
         }

@@ -171,7 +171,7 @@ object Utils {
     }
 
     internal fun checkVoid(type: Type): Boolean {
-        if (type == Unit::class.java) {
+        if (type == Unit::class.java || type == Void::class.java) {
             return true
         }
         if (type is Class<*> && type.isPrimitive) {

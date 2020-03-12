@@ -9,26 +9,15 @@ import com.zpf.modelsqlite.interfaces.ObjCreator;
 import com.zpf.modelsqlite.utils.SqlCreatorImpl;
 import com.zpf.modelsqlite.utils.SqlJsonUtilImpl;
 
-import java.lang.reflect.Type;
-
 public class SqlUtil {
     private SqlUtil() {
     }
 
     private static volatile CacheDao defSqlDao;
 
-    public static void setDbPath(String dbPath) {
-        SQLiteConfig.INSTANCE.setDB_PATH$modelsqlite_debug(dbPath);
-    }
-
-    public static void setTag(String tag) {
-        SQLiteConfig.INSTANCE.setLOG_TAG$modelsqlite_debug(tag);
-    }
-
     public static void initConfig(Application app, String tag, String dbPath) {
-        SQLiteConfig.INSTANCE.initConfig$modelsqlite_debug(app, tag, dbPath);
+        SQLiteConfig.INSTANCE.initConfig(app, tag, dbPath);
     }
-
 
     public static CacheDao getDao() {
         if (defSqlDao == null) {
@@ -54,11 +43,4 @@ public class SqlUtil {
         SqlCreatorImpl.Companion.get().addTypeCreator(creator);
     }
 
-
-    public static void checkType(Type type) {
-        if (type == boolean.class) {
-
-        }
-
-    }
 }

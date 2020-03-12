@@ -7,12 +7,19 @@ import android.view.View;
 import android.widget.Switch;
 
 import com.google.gson.Gson;
+import com.google.gson.InstanceCreator;
+import com.google.gson.TypeAdapter;
+import com.google.gson.internal.ConstructorConstructor;
+import com.google.gson.internal.ObjectConstructor;
+import com.google.gson.reflect.TypeToken;
 import com.zpf.modelsqlite.interfaces.ISqlJsonUtil;
 import com.zpf.modelsqlite.SqlUtil;
+import com.zpf.modelsqlite.interfaces.ObjCreator;
 import com.zpf.mysqlitedemo.R;
 import com.zpf.mysqlitedemo.data.AppConfig;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 
 public class MainActivity extends BaseActivity {
     private Gson gson = new Gson();
@@ -40,6 +47,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public String toJsonString(Object obj) {
                 return gson.toJson(obj);
+            }
+        });
+        final ConstructorConstructor constructor = new ConstructorConstructor(Collections.<Type, InstanceCreator<?>>emptyMap());
+        SqlUtil.addTypeCreator(new ObjCreator<Object>() {
+            @Override
+            public Object create(@NonNull Type t) {
+                ObjectConstructor objectConstructor = constructor.get(TypeToken.get(t));
+                if (objectConstructor != null) {
+                    return objectConstructor.construct();
+                }
+                return null;
             }
         });
     }

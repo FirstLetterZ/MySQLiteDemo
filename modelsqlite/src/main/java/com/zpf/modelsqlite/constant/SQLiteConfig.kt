@@ -52,12 +52,14 @@ object SQLiteConfig {
     internal var LOG_TAG = "ModelSQLite"
     internal var DEBUG = false
 
-    internal fun initConfig(app: Application, tag: String?, dbPath: String?) {
-        DEBUG = (app.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    fun initConfig(app: Application?, tag: String?, dbPath: String?) {
+        if (app != null) {
+            appContext = app
+            DEBUG = (app.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        }
         if (tag != null && tag.isNotEmpty()) {
             LOG_TAG = tag
         }
-        appContext = app
         DB_PATH = dbPath
     }
 }

@@ -12,7 +12,7 @@ Properties identifiable = new Properties()
 File identifiableFile = project.file('account.properties')
 if (identifiableFile.exists()) {
     identifiable.load(identifiableFile.newDataInputStream())
-}else{
+} else {
     identifiableFile = project.file('../account.properties')
     if (identifiableFile.exists()) {
         identifiable.load(identifiableFile.newDataInputStream())

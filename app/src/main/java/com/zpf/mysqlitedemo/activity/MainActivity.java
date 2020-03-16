@@ -36,12 +36,10 @@ public class MainActivity extends BaseActivity {
         tvLeft.setVisibility(View.GONE);
         SqlUtil.initConfig(getApplication(), "LOG_TAG", null);
         SqlUtil.setJsonUtil(new ISqlJsonUtil() {
-
             @Override
             public <T> T fromJson(String json, @NonNull Type type) {
                 return gson.fromJson(json, type);
             }
-
 
             @NonNull
             @Override
@@ -49,7 +47,8 @@ public class MainActivity extends BaseActivity {
                 return gson.toJson(obj);
             }
         });
-        final ConstructorConstructor constructor = new ConstructorConstructor(Collections.<Type, InstanceCreator<?>>emptyMap());
+        final ConstructorConstructor constructor = new ConstructorConstructor(
+                Collections.<Type, InstanceCreator<?>>emptyMap());
         SqlUtil.addTypeCreator(new ObjCreator<Object>() {
             @Override
             public Object create(@NonNull Type t) {

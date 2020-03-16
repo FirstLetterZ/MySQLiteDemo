@@ -52,11 +52,11 @@ data class SqlLimitInfo(
  * Created by ZPF on 2018/1/24.
  */
 data class SQLiteInfo(val tableName: String) {
-    var limitInfo: SqlLimitInfo? = null
-    var orderInfo: SqlOrderInfo? = null
-    var groupInfo: SqlGroupInfo? = null
-    val queryInfoList: ArrayList<SqlColumnInfo> = ArrayList()
-    val changeValueList: ArrayList<SqlColumnInfo> = ArrayList()
+    var limitInfo: SqlLimitInfo? = null//步长信息
+    var orderInfo: SqlOrderInfo? = null//排序信息
+    var groupInfo: SqlGroupInfo? = null//分组信息
+    val queryInfoList: ArrayList<SqlColumnInfo> = ArrayList()//查询条件
+    val changeValueList: ArrayList<SqlColumnInfo> = ArrayList()//更新信息
     var transaction: Boolean = false
 
     fun addQueryCondition(column: ColumnEnum, value: Any?): SQLiteInfo {

@@ -218,7 +218,7 @@ interface SqlExecutor {
                     is Page -> {
                         if (sqlMethodType is QUERY) {
                             type = checkSqlMethodType(it, type)
-                            if (pType is Number) {
+                            if (Utils.checkNumber(pType)) {
                                 if (it.offset >= 0 && it.pageSize > 0) {
                                     if (limitInfo == null) {
                                         limitInfo = SqlLimitInfo()

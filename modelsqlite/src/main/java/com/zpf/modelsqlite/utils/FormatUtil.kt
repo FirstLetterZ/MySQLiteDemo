@@ -129,18 +129,12 @@ object FormatUtil {
             val bindArgs = StringBuilder(SQLiteConfig.VALUES)
             bindArgs.append(formatString(table))
             valueList.map {
-                if (it.columnValue == null) {
+                if (it.columnValue != null) {
                     builder.append(SQLiteConfig.COMMA)
                             .append(SQLiteConfig.COLUMN_NAME)
                             .append(it.columnName.value)
                     bindArgs.append(SQLiteConfig.COMMA)
                             .append(Utils.getDefaultValue(it.columnName))
-                } else {
-                    builder.append(SQLiteConfig.COMMA)
-                            .append(SQLiteConfig.COLUMN_NAME)
-                            .append(it.columnName.value)
-                    bindArgs.append(SQLiteConfig.COMMA)
-                            .append(formatString(it.columnValue))
                 }
             }
             builder.append(SQLiteConfig.COMMA)

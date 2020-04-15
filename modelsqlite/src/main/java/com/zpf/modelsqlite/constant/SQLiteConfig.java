@@ -40,12 +40,12 @@ public class SQLiteConfig {
     public static final String AND = " AND ";
     public static final String OR = " OR ";
 
-    public static final String WHERE = " WHERE $FIRST_KEY_WORD = ";
+    public static final String WHERE = " WHERE " + FIRST_KEY_WORD + " = ";
     public static final String VALUES = ")VALUES(";
-    public static final String SQL_SELECT = "SELECT * FROM $TB_CACHE$WHERE";
-    public static final String SQL_UPDATE = "UPDATE $TB_CACHE SET ";
-    public static final String SQL_INSERT = "INSERT INTO $TB_CACHE (";
-    public static final String SQL_DELETE = "DELETE FROM $TB_CACHE$WHERE";
+    public static final String SQL_SELECT = "SELECT * FROM " + TB_CACHE + WHERE;
+    public static final String SQL_UPDATE = "UPDATE " + TB_CACHE + " SET ";
+    public static final String SQL_INSERT = "INSERT INTO " + TB_CACHE + " (";
+    public static final String SQL_DELETE = "DELETE FROM " + TB_CACHE + WHERE;
 
     private static Application appContext;
     private static boolean DEBUG = false;

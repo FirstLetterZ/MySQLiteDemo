@@ -99,16 +99,14 @@ object FormatUtil {
             builder.append(SQLiteConfig.TIME_UPDATE)
                     .append(SQLiteRelation.RELATION_EQUALITY.value)
                     .append(System.currentTimeMillis())
-            valueList.map { item ->
+            valueList.forEach { item ->
                 if (item.columnValue == null) {
                     if (!item.ignoreOnNull) {
                         builder.append(SQLiteConfig.COMMA)
                                 .append(SQLiteConfig.COLUMN_NAME)
                                 .append(item.columnName.value)
                                 .append(SQLiteRelation.RELATION_EQUALITY.value)
-                                .append(Utils.getDefaultValue(item.columnName))
-                    } else {
-                        //
+                                .append("NULL")
                     }
                 } else {
                     builder.append(SQLiteConfig.COMMA)
@@ -134,7 +132,7 @@ object FormatUtil {
                             .append(SQLiteConfig.COLUMN_NAME)
                             .append(it.columnName.value)
                     bindArgs.append(SQLiteConfig.COMMA)
-                            .append(Utils.getDefaultValue(it.columnName))
+                            .append(formatString(it.columnValue))
                 }
             }
             builder.append(SQLiteConfig.COMMA)
@@ -152,7 +150,7 @@ object FormatUtil {
 
     private fun formatString(any: Any?): String {
         if (any == null) {
-            return ""
+            return "NULL"
         } else if (any is Number) {
             return any.toString()
         } else {

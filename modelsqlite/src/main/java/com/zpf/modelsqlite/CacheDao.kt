@@ -163,7 +163,9 @@ class CacheDao : ISqlDao {
     override fun deleteByArray(infoList: List<SQLiteInfo>): Boolean {
         val sql = StringBuilder(mBuilderLength)
         val sqlArray = infoList.map {
-            sql.delete(0, sql.length - 1)
+            if (sql.isNotEmpty()) {
+                sql.delete(0, sql.length - 1)
+            }
             sql.append(SQLiteConfig.SQL_DELETE)
             FormatUtil.addConditionString(sql, it.queryInfoList, it.tableName)
             sql.toString()

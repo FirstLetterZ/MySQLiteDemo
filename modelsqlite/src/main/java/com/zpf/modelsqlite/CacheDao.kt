@@ -124,7 +124,6 @@ class CacheDao : ISqlDao {
         return execSqlString(sql.toString(), info.transaction)
     }
 
-
     /**
      * 保存多条
      */
@@ -170,7 +169,7 @@ class CacheDao : ISqlDao {
             FormatUtil.addConditionString(sql, it.queryInfoList, it.tableName)
             sql.toString()
         }
-        return execSqlArray(sqlArray)
+        return execSqlArray(sqlArray, true)
     }
 
     /**
@@ -209,19 +208,19 @@ class CacheDao : ISqlDao {
         return result
     }
 
-
     /**
      * 单条查询第一条符合条件的结果
      */
     override fun <T> queryFirst(type: Type, info: SQLiteInfo): T? {
-        val value: T? = SqlCreatorImpl.newInstance(type)
-        if (value != null) {
-            val cursor = queryCursor(info)
-            if (cursor.moveToFirst()) {
+        var value: T? = null
+        val cursor = queryCursor(info)
+        if (cursor.moveToFirst()) {
+            value = SqlCreatorImpl.newInstance(type)
+            if (value != null) {
                 putValueToReceiver(value, cursor)
             }
-            cursor.close()
         }
+        cursor.close()
         return value
     }
 
@@ -274,9 +273,19 @@ class CacheDao : ISqlDao {
                                     if (obj != null) {
                                         f.isAccessible = true
                                         val value = f[obj]
-                                        changeValueList.add(SqlColumnInfo(relevance.saveColumn, value))
+                                        changeValueList.add(
+                                            SqlColumnInfo(
+                                                relevance.saveColumn,
+                                                value
+                                            )
+                                        )
                                         val sqLiteInfo = SQLiteInfo(classify.tableName)
-                                        sqLiteInfo.queryInfoList.add(SqlColumnInfo(relevance.targetColumn, value))
+                                        sqLiteInfo.queryInfoList.add(
+                                            SqlColumnInfo(
+                                                relevance.targetColumn,
+                                                value
+                                            )
+                                        )
                                         saveValue(obj, sqLiteInfo)
                                     }
                                 } catch (e: IllegalAccessException) {
@@ -308,7 +317,8 @@ class CacheDao : ISqlDao {
                     field.isAccessible = true
                     val value = getValueByCursor(cursor, note.column)
                     if (value != null && value is String
-                            && field.type != String::class.java) {
+                        && field.type != String::class.java
+                    ) {
                         val newValue: Any? = SqlJsonUtilImpl.fromJson(value.toString(), field.type)
                         field[receiver] = newValue
                     } else {
@@ -342,7 +352,6 @@ class CacheDao : ISqlDao {
         }
     }
 
-
     /**
      * 根据光标获取对应值
      */
@@ -370,10 +379,6 @@ class CacheDao : ISqlDao {
             mSQLiteDatabase = mSQLiteOpenHelper.writableDatabase
         }
         return mSQLiteDatabase!!
-    }
-
-    fun execSqlArray(sqlStringArray: List<String>): Boolean {
-        return execSqlArray(sqlStringArray, true)
     }
 
     override fun execSqlArray(sqlStringArray: List<String>, openTransaction: Boolean): Boolean {

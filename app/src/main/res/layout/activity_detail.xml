@@ -94,7 +94,6 @@
                     android:id="@+id/rb_man"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
                     android:text="男"/>
 
                 <RadioButton
@@ -105,6 +104,7 @@
 
                 <RadioButton
                     android:id="@+id/rb_null"
+                    android:checked="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="空"/>

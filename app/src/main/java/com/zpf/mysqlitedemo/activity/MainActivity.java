@@ -19,9 +19,10 @@ import com.zpf.mysqlitedemo.data.AppConfig;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 public class MainActivity extends BaseActivity {
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     @Override
     public int getLayoutId() {
@@ -57,6 +58,7 @@ public class MainActivity extends BaseActivity {
                 return null;
             }
         });
+        SqlUtil.setLogger(Logger.getGlobal());
     }
 
     public void showGroupList(View view) {
@@ -69,7 +71,6 @@ public class MainActivity extends BaseActivity {
 
     public void addGroup(View view) {
         startActivity(makeIntent(DetailActivity.class).putExtra(DetailActivity.TYPE, DetailActivity.TYPE_ADD).putExtra(DetailActivity.IS_STUDENT, false));
-
     }
 
     public void showStudentList(View view) {

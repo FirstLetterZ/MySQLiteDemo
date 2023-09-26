@@ -44,8 +44,9 @@ public class DetailActivity extends BaseActivity {
     private RadioGroup rgSex;
     private RadioButton rbNull;
     private boolean isStudentType;
-    private Gson gson = new Gson();
-    private String studentId, studentName, studentAge, studentSex, groupId, groupName;
+    private final Gson gson = new Gson();
+    private Integer studentId, groupId, studentAge;
+    private String studentName, studentSex, groupName;
 
     @Override
     public int getLayoutId() {
@@ -134,41 +135,23 @@ public class DetailActivity extends BaseActivity {
             public void onClick(View v) {
                 if (AppConfig.checked) {
                     getEditValue();
-                    Integer gId;
-                    try {
-                        gId = Integer.parseInt(groupId);
-                    } catch (NumberFormatException e) {
-                        gId = null;
-                    }
                     if (isStudentType) {
-                        Integer sId;
-                        try {
-                            sId = Integer.parseInt(studentId);
-                        } catch (NumberFormatException e) {
-                            sId = null;
-                        }
                         String sName = null;
                         if (!TextUtils.isEmpty(studentName)) {
                             sName = studentName;
-                        }
-                        Integer sAge;
-                        try {
-                            sAge = Integer.parseInt(studentAge);
-                        } catch (NumberFormatException e) {
-                            sAge = null;
                         }
                         Boolean sex = null;
                         if (!TextUtils.isEmpty(studentSex)) {
                             sex = "女".equals(studentSex);
                         }
-                        List<Student> studentList = SqlDao.getApi().queryStudent(sId, sName, sAge, sex, gId);
+                        List<Student> studentList = SqlDao.getApi().queryStudent(studentId, sName, studentAge, sex, groupId);
                         setResult(studentList);
                     } else {
                         String gName = null;
                         if (!TextUtils.isEmpty(groupName)) {
                             gName = groupName;
                         }
-                        List<Group> groupList = SqlDao.getApi().queryGroup(gId, gName);
+                        List<Group> groupList = SqlDao.getApi().queryGroup(groupId, gName);
                         setResult(groupList);
                     }
                 } else {
@@ -304,13 +287,12 @@ public class DetailActivity extends BaseActivity {
 
     private void saveData() {
         getEditValue();
-        if (TextUtils.isEmpty(groupId)) {
+        if (groupId == null) {
             toast("group id 不能为空");
             return;
         }
         Group group = new Group();
-        int gId = Integer.valueOf(groupId);
-        group.setId(gId);
+        group.setId(groupId);
         if (TextUtils.isEmpty(groupName)) {
             group.setName(null);
         } else {
@@ -318,7 +300,7 @@ public class DetailActivity extends BaseActivity {
         }
         int result;
         if (isStudentType) {
-            if (TextUtils.isEmpty(studentId)) {
+            if (studentId == null) {
                 toast("student id 不能为空");
                 return;
             }
@@ -326,7 +308,7 @@ public class DetailActivity extends BaseActivity {
                 toast("student name 不能为空");
                 return;
             }
-            if (TextUtils.isEmpty(studentAge)) {
+            if (studentAge == null) {
                 toast("student age 不能为空");
                 return;
             }
@@ -335,23 +317,22 @@ public class DetailActivity extends BaseActivity {
                 return;
             }
             boolean female = "女".equals(studentSex);
-            int sId = Integer.parseInt(studentId);
             if (AppConfig.checked) {
-                Student student = SqlDao.getApi().checkStudent(sId);
+                Student student = SqlDao.getApi().checkStudent(studentId);
                 if (student != null) {
                     toast("id=" + studentId + "的条目已存在，更新条目内容");
                 } else {
                     student = new Student();
                     toast("不存在id=" + studentId + "的条目，新建条目");
                 }
-                student.setId(sId);
+                student.setId(studentId);
                 student.setFemale(female);
-                student.setAge(Integer.valueOf(studentAge));
+                student.setAge(studentAge);
                 student.setName(studentName);
                 student.setGroup(group);
-                result = SqlDao.getApi().saveStudent(student, sId);
+                result = SqlDao.getApi().saveStudent(student, studentId);
             } else {
-                SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, sId);
+                SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT).addQueryCondition(ColumnEnum.COLUMN_INT_001, studentId);
                 Student student = SqlUtil.getDao().queryFirst(Student.class, sqLiteInfo);
                 if (student != null) {
                     toast("id=" + studentId + "的条目已存在，更新条目内容");
@@ -359,9 +340,9 @@ public class DetailActivity extends BaseActivity {
                     student = new Student();
                     toast("不存在id=" + studentId + "的条目，新建条目");
                 }
-                student.setId(sId);
+                student.setId(studentId);
                 student.setFemale(female);
-                student.setAge(Integer.valueOf(studentAge));
+                student.setAge(studentAge);
                 student.setName(studentName);
                 student.setGroup(group);
                 result = SqlUtil.getDao().saveValue(student, sqLiteInfo);
@@ -372,12 +353,12 @@ public class DetailActivity extends BaseActivity {
                 return;
             }
             if (AppConfig.checked) {
-                if (SqlDao.getApi().checkGroup(gId) != null) {
+                if (SqlDao.getApi().checkGroup(groupId) != null) {
                     toast("id=" + groupId + "的条目已存在，更新条目内容");
                 } else {
                     toast("不存在id=" + groupId + "的条目，新建条目");
                 }
-                result = SqlDao.getApi().saveGroup(group, gId);
+                result = SqlDao.getApi().saveGroup(group, groupId);
             } else {
                 SQLiteInfo sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP)
                         .addQueryCondition(ColumnEnum.COLUMN_INT_001, group.getId());
@@ -405,10 +386,10 @@ public class DetailActivity extends BaseActivity {
         getEditValue();
         if (isStudentType) {
             sqLiteInfo = new SQLiteInfo(AppConfig.TB_STUDENT);
-            if (!TextUtils.isEmpty(studentId)) {
+            if (studentId != null) {
                 sqLiteInfo.addQueryCondition(ColumnEnum.COLUMN_INT_001, studentId);
             }
-            if (!TextUtils.isEmpty(studentAge)) {
+            if (studentAge != null) {
                 sqLiteInfo.addQueryCondition(ColumnEnum.COLUMN_INT_002, studentAge);
             }
             if (!TextUtils.isEmpty(studentName)) {
@@ -419,7 +400,7 @@ public class DetailActivity extends BaseActivity {
             }
         } else {
             sqLiteInfo = new SQLiteInfo(AppConfig.TB_GROUP);
-            if (!TextUtils.isEmpty(groupId)) {
+            if (groupId != null) {
                 sqLiteInfo.addQueryCondition(ColumnEnum.COLUMN_INT_001, groupId);
             }
             if (!TextUtils.isEmpty(groupName)) {
@@ -430,11 +411,35 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void getEditValue() {
-        groupId = etGroupId.getText().toString().trim();
+        String groupIdStr = etGroupId.getText().toString().trim();
+        groupId = null;
+        if (!TextUtils.isEmpty(groupIdStr)) {
+            try {
+                groupId = Integer.parseInt(groupIdStr);
+            } catch (NumberFormatException e) {
+                //
+            }
+        }
         groupName = etGroupName.getText().toString().trim();
-        studentId = etStudentId.getText().toString().trim();
+        String studentIdStr = etStudentId.getText().toString().trim();
+        studentId = null;
+        if (!TextUtils.isEmpty(studentIdStr)) {
+            try {
+                studentId = Integer.parseInt(studentIdStr);
+            } catch (NumberFormatException e) {
+                //
+            }
+        }
         studentName = etStudentName.getText().toString().trim();
-        studentAge = etStudentAge.getText().toString().trim();
+        String studentAgeStr = etStudentAge.getText().toString().trim();
+        studentAge = null;
+        if (!TextUtils.isEmpty(studentAgeStr)) {
+            try {
+                studentAge = Integer.parseInt(studentAgeStr);
+            } catch (NumberFormatException e) {
+                //
+            }
+        }
         int sexId = rgSex.getCheckedRadioButtonId();
         if (sexId == R.id.rb_man) {
             studentSex = "男";

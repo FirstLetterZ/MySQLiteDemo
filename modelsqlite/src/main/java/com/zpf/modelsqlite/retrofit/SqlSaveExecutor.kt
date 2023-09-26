@@ -27,7 +27,7 @@ class SqlSaveExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
                 null
             } else {
                 val temp = SQLiteInfo(tableName)
-                whereList.forEachIndexed { i, item ->
+                whereList.forEach { item ->
                     index = (item.columnValue as? Int) ?: -1
                     if (index >= 0) {
                         value = args.getOrNull(index)
@@ -53,7 +53,7 @@ class SqlSaveExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
             if (sqlInfo.changeValueList.isEmpty()) {
                 return -1
             }
-            whereList?.forEachIndexed { i, item ->
+            whereList?.forEach { item ->
                 index = (item.columnValue as? Int) ?: -1
                 if (index >= 0) {
                     value = args?.getOrNull(index)

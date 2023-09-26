@@ -16,12 +16,11 @@ object SqlRetrofit {
         if (!service.isInterface) {
             throw java.lang.IllegalArgumentException("API declarations must be interfaces.")
         }
-        return Proxy.newProxyInstance(service.classLoader, arrayOf<Class<*>?>(service)
+        return Proxy.newProxyInstance(
+            service.classLoader, arrayOf<Class<*>?>(service)
         ) { _, method, args ->
             val re = getSqlMethodHandler(method)?.invoke(SqlUtil.getDao(), args)
-            if(SQLiteConfig.isDebug()) {
-                Logger.i("onProxy: " + SqlJsonUtilImpl.get().toJsonString(re))
-            }
+            Logger.i("onProxy: " + SqlJsonUtilImpl.toJsonString(re))
             re
         } as? T
     }
@@ -37,7 +36,8 @@ object SqlRetrofit {
                 val returnType = method.genericReturnType
                 if (Utils.hasUnresolvableType(returnType)) {
                     throw IllegalArgumentException(
-                            "Method return type must not include a type variable or wildcard: " + returnType.toString() + " for method " + method.name)
+                        "Method return type must not include a type variable or wildcard: " + returnType.toString() + " for method " + method.name
+                    )
                 }
                 val sqlFactory = SqlExecutor.Builder(method).build()
                 if (sqlFactory != null) {

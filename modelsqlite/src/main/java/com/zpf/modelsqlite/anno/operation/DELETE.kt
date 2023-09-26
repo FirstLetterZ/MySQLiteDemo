@@ -6,7 +6,7 @@ package com.zpf.modelsqlite.anno.operation
  * Created by ZPF on 2020/3/6.
  */
 @Target(AnnotationTarget.FUNCTION)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class DELETE(
         val table: String,
         val transaction: Boolean = false//开启事务

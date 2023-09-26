@@ -8,7 +8,8 @@ import com.zpf.modelsqlite.constant.ColumnEnum
  * Created by ZPF on 2018/4/24.
  */
 @Target(AnnotationTarget.FIELD)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
-annotation class SQLiteRelevance(val saveColumn: ColumnEnum //保存的位置,应查找类型一致
-                                 , val targetColumn: ColumnEnum //查找的关键字,应与保存类型一致
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SQLiteRelevance(
+    val saveColumn: ColumnEnum, //保存的位置,应查找类型一致
+    val targetColumn: ColumnEnum //查找的关键字,应与保存类型一致
 )

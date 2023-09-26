@@ -6,5 +6,5 @@ package com.zpf.modelsqlite.anno.additional
  * Created by ZPF on 2020/3/6.
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class DataBody

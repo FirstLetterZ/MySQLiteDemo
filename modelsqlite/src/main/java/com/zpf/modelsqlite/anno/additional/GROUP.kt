@@ -7,5 +7,5 @@ import com.zpf.modelsqlite.constant.ColumnEnum
  * Created by ZPF on 2020/3/6.
  */
 @Target(AnnotationTarget.FUNCTION)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class GROUP(val columns: Array<ColumnEnum>)

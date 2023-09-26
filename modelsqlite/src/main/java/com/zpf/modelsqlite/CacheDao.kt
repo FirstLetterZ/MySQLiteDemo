@@ -24,7 +24,7 @@ class CacheDao : ISqlDao {
     private val mSQLiteOpenHelper: SQLiteOpenHelper
 
     constructor(dbPath: String?) {
-        val path = if (dbPath == null || dbPath.isEmpty()) {
+        val path = if (dbPath.isNullOrEmpty()) {
             SQLiteConfig.DB_USER_CACHE
         } else if (dbPath.endsWith("/")) {
             dbPath + SQLiteConfig.DB_USER_CACHE
@@ -74,7 +74,7 @@ class CacheDao : ISqlDao {
                 }
             }
             if (insertInfo == null) {
-                Logger.e("未找到数据对应的表格信息：" + value.javaClass.name)
+                Logger.w("未找到数据对应的表格信息：" + value.javaClass.name)
             } else {
                 initChangeValueList(value, insertInfo.changeValueList)
                 insertValue(insertInfo)
@@ -138,7 +138,7 @@ class CacheDao : ISqlDao {
                 getDatabase().setTransactionSuccessful()
                 return true
             } catch (e: Exception) {
-                Logger.e(e.toString())
+                Logger.w(e.toString())
                 return false
             } finally {
                 getDatabase().endTransaction()
@@ -200,8 +200,7 @@ class CacheDao : ISqlDao {
      */
     override fun getColumnValue(column: ColumnEnum, info: SQLiteInfo): Any? {
         val cursor = queryCursor(info)
-        val result: Any?
-        result = if (cursor.moveToFirst()) {
+        val result: Any? = if (cursor.moveToFirst()) {
             getValueByCursor(cursor, column)
         } else {
             Utils.getDefaultValue(column)
@@ -215,7 +214,7 @@ class CacheDao : ISqlDao {
      * 单条查询第一条符合条件的结果
      */
     override fun <T> queryFirst(type: Type, info: SQLiteInfo): T? {
-        val value: T? = SqlCreatorImpl.get().newInstance(type)
+        val value: T? = SqlCreatorImpl.newInstance(type)
         if (value != null) {
             val cursor = queryCursor(info)
             if (cursor.moveToFirst()) {
@@ -233,7 +232,7 @@ class CacheDao : ISqlDao {
         val list = ArrayList<T>()
         val cursor = queryCursor(info)
         while (cursor.moveToNext()) {
-            val listValue: T? = SqlCreatorImpl.get().newInstance(type)
+            val listValue: T? = SqlCreatorImpl.newInstance(type)
             if (listValue == null) {
                 break
             } else {
@@ -256,7 +255,7 @@ class CacheDao : ISqlDao {
                     val value = field[model]
                     changeValueList.add(SqlColumnInfo(note.column, value))
                 } catch (e: IllegalAccessException) {
-                    Logger.e("fail on step initChangeValueList : ${e.message}")
+                    Logger.w("fail on step initChangeValueList : ${e.message}")
                 } finally {
                     field.isAccessible = false
                 }
@@ -281,7 +280,7 @@ class CacheDao : ISqlDao {
                                         saveValue(obj, sqLiteInfo)
                                     }
                                 } catch (e: IllegalAccessException) {
-                                    Logger.e("fail on step initChangeValueList : init @SQLiteRelevance fail & ${e.message}")
+                                    Logger.w("fail on step initChangeValueList : init @SQLiteRelevance fail & ${e.message}")
                                 } finally {
                                     f.isAccessible = false
                                     field.isAccessible = false
@@ -291,7 +290,7 @@ class CacheDao : ISqlDao {
 
                         }
                     } else {
-                        Logger.e("fail on step initChangeValueList : @SQLiteRelevance class lack @SQLiteClassify")
+                        Logger.w("fail on step initChangeValueList : @SQLiteRelevance class lack @SQLiteClassify")
                     }
                 }
             }
@@ -310,13 +309,13 @@ class CacheDao : ISqlDao {
                     val value = getValueByCursor(cursor, note.column)
                     if (value != null && value is String
                             && field.type != String::class.java) {
-                        val newValue: Any? = SqlJsonUtilImpl.get().fromJson(value.toString(), field.type)
+                        val newValue: Any? = SqlJsonUtilImpl.fromJson(value.toString(), field.type)
                         field[receiver] = newValue
                     } else {
                         field[receiver] = value
                     }
                 } catch (e: Exception) {
-                    Logger.e("putValueToReceiver SQLiteColumn!=null：$e")
+                    Logger.w("putValueToReceiver SQLiteColumn!=null：$e")
                 } finally {
                     field.isAccessible = false
                 }
@@ -333,7 +332,7 @@ class CacheDao : ISqlDao {
                             field.isAccessible = true
                             field[receiver] = relevanceObj
                         } catch (e: Exception) {
-                            Logger.e("putValueToReceiver SQLiteRelevance!=null：$e")
+                            Logger.w("putValueToReceiver SQLiteRelevance!=null：$e")
                         } finally {
                             field.isAccessible = false
                         }
@@ -349,8 +348,7 @@ class CacheDao : ISqlDao {
      */
     private fun getValueByCursor(cursor: Cursor, column: ColumnEnum): Any? {
         val index = cursor.getColumnIndex(SQLiteConfig.COLUMN_NAME + column.value)
-        val result: Any?
-        result = if (index >= 0) {
+        val result: Any? = if (index >= 0) {
             when (Utils.getColumnType(column.value)) {
                 SQLiteConfig.TYPE_STRING -> cursor.getString(index)
                 SQLiteConfig.TYPE_INT -> cursor.getInt(index)
@@ -394,7 +392,7 @@ class CacheDao : ISqlDao {
                 }
                 true
             } catch (e: Exception) {
-                Logger.e("execSQL fail : ${e.message}")
+                Logger.w("execSQL fail : ${e.message}")
                 if (openTransaction) {
                     it.endTransaction()
                 }
@@ -417,7 +415,7 @@ class CacheDao : ISqlDao {
                 }
                 true
             } catch (e: Exception) {
-                Logger.e("execSQL fail : ${e.message}")
+                Logger.w("execSQL fail : ${e.message}")
                 if (openTransaction) {
                     it.endTransaction()
                 }

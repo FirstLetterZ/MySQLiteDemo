@@ -14,7 +14,7 @@ class SqlOriginalExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
         val result = sqlString
         var newValue: String
         replaceMap?.map {
-            newValue = SqlJsonUtilImpl.get().toJsonString(it.value)
+            newValue = SqlJsonUtilImpl.toJsonString(it.value)
             result.replace("{${it.key}}", newValue)
         }
         return sqlDao.execSqlString(result, transaction)

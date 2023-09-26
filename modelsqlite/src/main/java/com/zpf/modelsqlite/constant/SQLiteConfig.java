@@ -5,9 +5,7 @@ import android.content.pm.ApplicationInfo;
 
 public class SQLiteConfig {
     private SQLiteConfig() {
-
     }
-
     public static final int DB_CACHE_VERSION = 1;
     public static final String DB_USER_CACHE = "userCache.db";
     public static final String TB_CACHE = "userCache";
@@ -48,17 +46,11 @@ public class SQLiteConfig {
     public static final String SQL_DELETE = "DELETE FROM " + TB_CACHE + WHERE;
 
     private static Application appContext;
-    private static boolean DEBUG = false;
     public static String DB_PATH = null;
-    public static String LOG_TAG = "ModelSQLite";
 
-    public static void initConfig(Application app, String tag, String dbPath) {
+    public static void initConfig(Application app, String dbPath) {
         if (app != null) {
             appContext = app;
-            DEBUG = (app.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        }
-        if (tag != null && tag.length() > 0) {
-            LOG_TAG = tag;
         }
         DB_PATH = dbPath;
     }
@@ -67,7 +59,4 @@ public class SQLiteConfig {
         return appContext;
     }
 
-    public static boolean isDebug() {
-        return DEBUG;
-    }
 }

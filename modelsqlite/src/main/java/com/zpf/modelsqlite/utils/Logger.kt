@@ -1,31 +1,27 @@
 package com.zpf.modelsqlite.utils
 
-import android.util.Log
-import com.zpf.modelsqlite.constant.SQLiteConfig
+import java.util.logging.Level
+import java.util.logging.Logger
 
 object Logger {
-
-    internal fun d(msg: String?) {
-        if (SQLiteConfig.isDebug() && !msg.isNullOrEmpty()) {
-            Log.d(SQLiteConfig.LOG_TAG, msg)
-        }
-    }
+    var realLogger: Logger? = null
 
     internal fun i(msg: String?) {
-        if (SQLiteConfig.isDebug() && !msg.isNullOrEmpty()) {
-            Log.i(SQLiteConfig.LOG_TAG, msg)
+        if (msg.isNullOrEmpty()) {
+            return
         }
+        logout(Level.INFO, msg)
     }
 
     internal fun w(msg: String?) {
-        if (SQLiteConfig.isDebug() && !msg.isNullOrEmpty()) {
-            Log.w(SQLiteConfig.LOG_TAG, msg)
+        if (msg.isNullOrEmpty()) {
+            return
         }
+        logout(Level.WARNING, msg)
     }
 
-    internal fun e(msg: String?) {
-        if (SQLiteConfig.isDebug() && !msg.isNullOrEmpty()) {
-            Log.e(SQLiteConfig.LOG_TAG, msg)
-        }
+    private fun logout(level: Level, msg: String) {
+        realLogger?.log(level, msg)
     }
+
 }

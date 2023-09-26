@@ -1,6 +1,6 @@
 package com.zpf.mysqlitedemo;
 
-import com.zpf.modelsqlite.retrofit.SqlRetrofit;
+import com.zpf.modelsqlite.SqlUtil;
 
 public class SqlDao {
 
@@ -9,6 +9,6 @@ public class SqlDao {
     }
 
     private static class SqlApiInstance {
-        static final SqlApi sqlApi = SqlRetrofit.INSTANCE.create(SqlApi.class);
+        static final SqlApi sqlApi = SqlUtil.create(SqlApi.class);
     }
 }

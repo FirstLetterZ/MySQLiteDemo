@@ -2,7 +2,6 @@ package com.zpf.mysqlitedemo.activity;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +9,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.zpf.modelsqlite.SQLiteInfo;
@@ -266,7 +267,6 @@ public class DetailActivity extends BaseActivity {
         }
     }
 
-
     private void initWithData(Student student) {
         if (student == null) {
             return;
@@ -372,7 +372,7 @@ public class DetailActivity extends BaseActivity {
                 return;
             }
             if (AppConfig.checked) {
-                if (SqlDao.getApi().checkGroup(gId)!=null) {
+                if (SqlDao.getApi().checkGroup(gId) != null) {
                     toast("id=" + groupId + "的条目已存在，更新条目内容");
                 } else {
                     toast("不存在id=" + groupId + "的条目，新建条目");

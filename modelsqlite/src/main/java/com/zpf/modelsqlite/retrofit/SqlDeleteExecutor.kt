@@ -16,7 +16,7 @@ class SqlDeleteExecutor(builder: SqlExecutor.Builder) : SqlExecutor {
         var index: Int
         var value: Any?
         var tempColumn: SqlColumnInfo
-        whereList?.forEachIndexed { i, item ->
+        whereList?.forEach { item ->
             index = (item.columnValue as? Int) ?: -1
             if (index >= 0) {
                 value = args?.getOrNull(index)

@@ -8,7 +8,7 @@ import com.zpf.modelsqlite.constant.SQLiteRelation
  * Created by ZPF on 2020/3/6.
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class Havinng(
         val column: ColumnEnum,
         val relation: SQLiteRelation = SQLiteRelation.RELATION_EQUALITY,

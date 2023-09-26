@@ -3,11 +3,12 @@ package com.zpf.mysqlitedemo.adapter;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.zpf.modelsqlite.SQLiteInfo;
 import com.zpf.modelsqlite.SqlOrderInfo;

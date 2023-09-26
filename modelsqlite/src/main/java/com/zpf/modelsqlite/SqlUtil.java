@@ -6,8 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.zpf.modelsqlite.constant.SQLiteConfig;
 import com.zpf.modelsqlite.interfaces.ISqlJsonUtil;
 import com.zpf.modelsqlite.interfaces.ObjCreator;
+import com.zpf.modelsqlite.retrofit.SqlRetrofit;
 import com.zpf.modelsqlite.utils.SqlCreatorImpl;
 import com.zpf.modelsqlite.utils.SqlJsonUtilImpl;
+
+import java.util.logging.Logger;
 
 public class SqlUtil {
     private SqlUtil() {
@@ -15,8 +18,8 @@ public class SqlUtil {
 
     private static volatile CacheDao defSqlDao;
 
-    public static void initConfig(Application app, String tag, String dbPath) {
-        SQLiteConfig.initConfig(app, tag, dbPath);
+    public static void initConfig(Application app, String dbPath) {
+        SQLiteConfig.initConfig(app, dbPath);
     }
 
     public static CacheDao getDao() {
@@ -28,7 +31,6 @@ public class SqlUtil {
             }
         }
         return defSqlDao;
-
     }
 
     public static CacheDao creatCacheDao(SQLiteOpenHelper openHelper) {
@@ -36,11 +38,18 @@ public class SqlUtil {
     }
 
     public static void setJsonUtil(ISqlJsonUtil util) {
-        SqlJsonUtilImpl.Companion.get().setJsonUtil(util);
+        SqlJsonUtilImpl.INSTANCE.setJsonUtil(util);
     }
 
     public static void addTypeCreator(ObjCreator<?> creator) {
-        SqlCreatorImpl.Companion.get().addTypeCreator(creator);
+        SqlCreatorImpl.INSTANCE.addTypeCreator(creator);
     }
 
+    public static void setLogger(Logger logger) {
+        com.zpf.modelsqlite.utils.Logger.INSTANCE.setRealLogger(logger);
+    }
+
+    public static <T> T create(Class<T> service) {
+        return SqlRetrofit.INSTANCE.create(service);
+    }
 }

@@ -3,14 +3,7 @@ package com.zpf.modelsqlite.utils
 import com.zpf.modelsqlite.interfaces.ObjCreator
 import java.lang.reflect.Type
 
-class SqlCreatorImpl private constructor() {
-    companion object {
-        private val impl = SqlCreatorImpl()
-        fun get(): SqlCreatorImpl {
-            return impl
-        }
-    }
-
+internal object SqlCreatorImpl {
     private val cacheMap = HashMap<Type, ObjCreator<*>>()
     private val creatorSet = HashSet<ObjCreator<*>>()
 
@@ -30,7 +23,7 @@ class SqlCreatorImpl private constructor() {
             result = try {
                 rawTypeClass.newInstance()
             } catch (e: Exception) {
-                Logger.e("newInstance-->$e")
+                Logger.w("newInstance-->$e")
                 null
             }
             if (result == null) {
@@ -39,7 +32,7 @@ class SqlCreatorImpl private constructor() {
                     val args: Array<Any>? = null
                     constructor.newInstance(args)
                 } catch (e: Exception) {
-                    Logger.e("constructor-->$e")
+                    Logger.w("constructor-->$e")
                     null
                 }
             }

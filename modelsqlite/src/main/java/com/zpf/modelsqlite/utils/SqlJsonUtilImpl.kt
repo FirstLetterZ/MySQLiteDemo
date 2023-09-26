@@ -6,18 +6,14 @@ import org.json.JSONObject
 import java.lang.reflect.Type
 import java.math.BigDecimal
 
-class SqlJsonUtilImpl private constructor() : ISqlJsonUtil {
-
-    companion object {
-        private val impl = SqlJsonUtilImpl()
-        fun get(): SqlJsonUtilImpl {
-            return impl
-        }
-    }
-
+internal object SqlJsonUtilImpl : ISqlJsonUtil {
     private var realJsonUtil: ISqlJsonUtil? = null
 
     override fun toJsonString(obj: Any?): String {
+        val util = realJsonUtil
+        if (util != null) {
+            return util.toJsonString(obj)
+        }
         return when (obj) {
             null -> {
                 ""
@@ -45,13 +41,17 @@ class SqlJsonUtilImpl private constructor() : ISqlJsonUtil {
                 obj.toString()
             }
             else -> {
-                realJsonUtil?.toJsonString(obj) ?: obj.toString()
+                obj.toString()
             }
         }
     }
 
     override fun <T> fromJson(json: String?, type: Type): T? {
-        val result = when (type) {
+        val util = realJsonUtil
+        if (util != null) {
+            return util.fromJson(json, type)
+        }
+        val result: Any? = when (type) {
             Boolean::class.java -> {
                 "1" == json
             }
@@ -92,14 +92,18 @@ class SqlJsonUtilImpl private constructor() : ISqlJsonUtil {
                 }
             }
             JSONArray::class.java -> {
-                try {
-                    JSONArray(json)
-                } catch (e: Exception) {
+                if (json == null) {
                     null
+                } else {
+                    try {
+                        JSONArray(json)
+                    } catch (e: Exception) {
+                        null
+                    }
                 }
             }
             else -> {
-                realJsonUtil?.fromJson(json, type)
+                null
             }
         }
         return result as? T

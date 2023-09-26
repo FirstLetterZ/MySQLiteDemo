@@ -10,22 +10,19 @@ import com.zpf.modelsqlite.constant.SQLiteConfig
  * 数据库构建
  * Created by ZPF on 2018/1/29.
  */
-class CacheSQLiteHelper internal constructor(context: Context, name: String?) : SQLiteOpenHelper(context, name, null, SQLiteConfig.DB_CACHE_VERSION) {
+open class CacheSQLiteHelper internal constructor(context: Context, name: String?) :
+    SQLiteOpenHelper(context, name, null, SQLiteConfig.DB_CACHE_VERSION) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(createTbCache())
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
 
-    protected fun createTbCache(): String {
+    protected open fun createTbCache(): String {
         val builder = StringBuilder()
-        builder.append("create table if not exists ")
-                .append(SQLiteConfig.TB_CACHE)
-                .append("(")
-                .append(SQLiteConfig.PRIMARY_KEY)
-                .append(" integer primary key autoincrement,")
-                .append(SQLiteConfig.FIRST_KEY_WORD)
-                .append(" text")
+        builder.append("create table if not exists ").append(SQLiteConfig.TB_CACHE).append("(")
+            .append(SQLiteConfig.PRIMARY_KEY).append(" integer primary key autoincrement,")
+            .append(SQLiteConfig.FIRST_KEY_WORD).append(" text")
         val columnEnums = ColumnEnum.values()
         for (columnEnum in columnEnums) {
             val column = columnEnum.value
@@ -34,14 +31,9 @@ class CacheSQLiteHelper internal constructor(context: Context, name: String?) : 
                 builder.append(",").append(SQLiteConfig.COLUMN_NAME).append(column).append(str)
             }
         }
-        builder.append(",")
-                .append(SQLiteConfig.TIME_CREATE)
-                .append(" integer,")
-                .append(SQLiteConfig.TIME_UPDATE)
-                .append(" integer,")
-                .append(SQLiteConfig.OTHER)
-                .append(" text")
-                .append(")")
+        builder.append(",").append(SQLiteConfig.TIME_CREATE).append(" integer,")
+            .append(SQLiteConfig.TIME_UPDATE).append(" integer,").append(SQLiteConfig.OTHER)
+            .append(" text").append(")")
         return builder.toString()
     }
 

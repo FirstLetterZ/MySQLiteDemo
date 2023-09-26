@@ -6,7 +6,7 @@ package com.zpf.modelsqlite.anno.operation
  * Created by ZPF on 2020/3/6.
  */
 @Target(AnnotationTarget.FUNCTION)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class QUERY(
         val table: String,//表
         val startIndex: Int = 0,

@@ -5,5 +5,5 @@ package com.zpf.modelsqlite.anno
  * Created by ZPF on 2018/1/24.
  */
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class SQLiteClassify(val tableName: String)

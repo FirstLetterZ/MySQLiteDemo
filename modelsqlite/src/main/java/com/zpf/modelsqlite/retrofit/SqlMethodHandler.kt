@@ -13,37 +13,37 @@ class SqlMethodHandler(private val factory: SqlExecutor, private val type: Type)
             return result
         }
         if (Utils.checkNumber(type)) {
-            if (Utils.checkNumber(result.javaClass)) {
-                return result as Number
+            return if (Utils.checkNumber(result.javaClass)) {
+                result as Number
             } else if (Utils.checkBoolean(result.javaClass)) {
-                return if (result as Boolean) {
+                if (result as Boolean) {
                     1
                 } else {
                     -1
                 }
             } else {
-                return try {
+                try {
                     result.toString().toInt()
                 } catch (e: Exception) {
                     -1
                 }
             }
         } else if (Utils.checkBoolean(type)) {
-            if (Utils.checkBoolean(result.javaClass)) {
-                return result as Boolean
+            return if (Utils.checkBoolean(result.javaClass)) {
+                result as Boolean
             } else if (Utils.checkNumber(result.javaClass)) {
-                return ((result as Number).toInt() > 0)
+                ((result as Number).toInt() > 0)
             } else if (result is CharSequence) {
-                return result.isNotEmpty()
+                result.isNotEmpty()
             } else if (result is Map<*, *>) {
-                return result.size > 0
+                result.size > 0
             } else if (result is Iterable<*>) {
-                return result.iterator().hasNext()
+                result.iterator().hasNext()
             } else {
-                return true
+                true
             }
         } else if (type is CharSequence) {
-            return SqlJsonUtilImpl.get().toJsonString(result)
+            return SqlJsonUtilImpl.toJsonString(result)
         } else if (type is Class<*> && type.isPrimitive) {
             return when (type.name) {
                 "char" -> result.toString().toCharArray().getOrNull(0)

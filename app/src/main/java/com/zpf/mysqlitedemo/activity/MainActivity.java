@@ -44,6 +44,9 @@ public class MainActivity extends BaseActivity {
             @NonNull
             @Override
             public String toJsonString(Object obj) {
+                if (obj instanceof CharSequence) {
+                    return obj.toString();
+                }
                 return gson.toJson(obj);
             }
         });

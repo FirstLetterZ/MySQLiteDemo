@@ -40,12 +40,8 @@ object FormatUtil {
         } else if (!builder.endsWith("'$table'")) {
             builder.append(SQLiteConfig.WHERE).append(formatString(table))
         }
-        list?.map {
-            if (!useConnector) {
-                useConnector = addConditionPart(builder, it, useConnector)
-            } else {
-                addConditionPart(builder, it, useConnector)
-            }
+        list?.forEach {
+            addConditionPart(builder, it, useConnector)
         }
     }
 
@@ -94,7 +90,6 @@ object FormatUtil {
         }
     }
 
-
     fun addUpdateString(builder: StringBuilder, valueList: List<SqlColumnInfo>?) {
         if (!valueList.isNullOrEmpty()) {
             builder.append(SQLiteConfig.TIME_UPDATE).append(SQLiteRelation.RELATION_EQUALITY.value)
@@ -104,7 +99,8 @@ object FormatUtil {
                     if (!item.ignoreOnNull) {
                         builder.append(SQLiteConfig.COMMA).append(SQLiteConfig.COLUMN_NAME)
                             .append(item.columnName.value)
-                            .append(SQLiteRelation.RELATION_EQUALITY.value).append("NULL")
+                            .append(SQLiteRelation.RELATION_EQUALITY.value)
+                            .append(SQLiteConfig.DEF_NULL)
                     }
                 } else {
                     builder.append(SQLiteConfig.COMMA).append(SQLiteConfig.COLUMN_NAME)
@@ -123,7 +119,7 @@ object FormatUtil {
             }
             val bindArgs = StringBuilder(SQLiteConfig.VALUES)
             bindArgs.append(formatString(table))
-            valueList.map {
+            valueList.forEach {
                 if (it.columnValue != null) {
                     builder.append(SQLiteConfig.COMMA).append(SQLiteConfig.COLUMN_NAME)
                         .append(it.columnName.value)
@@ -141,10 +137,7 @@ object FormatUtil {
     private fun formatString(any: Any?): String {
         return when (any) {
             null -> {
-                "NULL"
-            }
-            is Number -> {
-                any.toString()
+                SQLiteConfig.DEF_NULL
             }
             else -> {
                 "'" + SqlJsonUtilImpl.toJsonString(any) + "'"

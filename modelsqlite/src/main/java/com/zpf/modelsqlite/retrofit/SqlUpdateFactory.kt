@@ -20,7 +20,7 @@ class SqlUpdateFactory(builder: SqlExecutor.Builder) : SqlExecutor {
         var index: Int
         var value: Any?
         var tempColumn: SqlColumnInfo
-        valueMap.map {
+        valueMap.forEach {
             index = (it.columnValue as? Int) ?: -1
             if (index >= 0) {
                 value = args?.getOrNull(index)
@@ -33,7 +33,7 @@ class SqlUpdateFactory(builder: SqlExecutor.Builder) : SqlExecutor {
         if (sqlInfo.changeValueList.isEmpty()) {
             return false
         }
-        whereList?.forEachIndexed { i, item ->
+        whereList?.forEach { item ->
             index = (item.columnValue as? Int) ?: -1
             if (index >= 0) {
                 value = args?.getOrNull(index)

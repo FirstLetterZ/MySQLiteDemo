@@ -28,12 +28,16 @@ open class CacheSQLiteHelper internal constructor(context: Context, name: String
             val column = columnEnum.value
             val str = getColumnType(column)
             if (str != null) {
-                builder.append(",").append(SQLiteConfig.COLUMN_NAME).append(column).append(str)
+                builder.append(",")
+                when (columnEnum) {
+                    ColumnEnum.CREATE_TIME -> builder.append(SQLiteConfig.TIME_CREATE)
+                    ColumnEnum.UPDATE_TIME -> builder.append(SQLiteConfig.TIME_UPDATE)
+                    else -> builder.append(SQLiteConfig.COLUMN_NAME).append(column)
+                }
+                builder.append(str)
             }
         }
-        builder.append(",").append(SQLiteConfig.TIME_CREATE).append(" integer,")
-            .append(SQLiteConfig.TIME_UPDATE).append(" integer,").append(SQLiteConfig.OTHER)
-            .append(" text").append(")")
+        builder.append(")")
         return builder.toString()
     }
 

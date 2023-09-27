@@ -10,23 +10,11 @@ internal object SqlJsonUtilImpl : ISqlJsonUtil {
     private var realJsonUtil: ISqlJsonUtil? = null
 
     override fun toJsonString(obj: Any?): String {
-        val util = realJsonUtil
-        if (util != null) {
-            return util.toJsonString(obj)
-        }
         return when (obj) {
-            null -> {
-                ""
-            }
-            is String -> {
-                obj
-            }
-            is BigDecimal -> {
-                obj.toPlainString()
-            }
-            is Number -> {
-                obj.toString()
-            }
+            null -> ""
+            is String -> obj
+            is BigDecimal -> obj.toPlainString()
+            is Number -> obj.toString()
             is Boolean -> {
                 if (obj) {
                     "1"
@@ -34,23 +22,20 @@ internal object SqlJsonUtilImpl : ISqlJsonUtil {
                     "0"
                 }
             }
-            is JSONObject -> {
-                obj.toString()
-            }
-            is JSONArray -> {
-                obj.toString()
-            }
+            is JSONObject -> obj.toString()
+            is JSONArray -> obj.toString()
             else -> {
-                obj.toString()
+                val util = realJsonUtil
+                if (util != null) {
+                    return util.toJsonString(obj)
+                } else {
+                    obj.toString()
+                }
             }
         }
     }
 
     override fun <T> fromJson(json: String?, type: Type): T? {
-        val util = realJsonUtil
-        if (util != null) {
-            return util.fromJson(json, type)
-        }
         val result: Any? = when (type) {
             Boolean::class.java -> {
                 "1" == json
@@ -103,7 +88,7 @@ internal object SqlJsonUtilImpl : ISqlJsonUtil {
                 }
             }
             else -> {
-                null
+                realJsonUtil?.fromJson(json, type)
             }
         }
         return result as? T

@@ -85,7 +85,7 @@ public class DetailActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 etGroupId.setEnabled(false);
-                etGroupName.setEnabled(true);
+                etGroupName.setEnabled(!isStudentType);
                 etStudentId.setEnabled(false);
                 etStudentAge.setEnabled(true);
                 etStudentName.setEnabled(true);
@@ -226,7 +226,7 @@ public class DetailActivity extends BaseActivity {
                 btnFind.setVisibility(View.GONE);
                 rbNull.setVisibility(View.GONE);
                 etGroupId.setEnabled(true);
-                etGroupName.setEnabled(true);
+                etGroupName.setEnabled(!isStudentType);
                 etStudentId.setEnabled(true);
                 etStudentAge.setEnabled(true);
                 etStudentName.setEnabled(true);

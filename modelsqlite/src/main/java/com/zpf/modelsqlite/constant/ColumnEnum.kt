@@ -5,6 +5,9 @@ package com.zpf.modelsqlite.constant
  * Created by ZPF on 2018/1/24.
  */
 enum class ColumnEnum(val value: Int) {
+    CREATE_TIME(SQLiteConfig.TYPE_INT + 991),
+    UPDATE_TIME(SQLiteConfig.TYPE_INT + 992),
+
     COLUMN_STRING_001(SQLiteConfig.TYPE_STRING + 1),
     COLUMN_STRING_002(SQLiteConfig.TYPE_STRING + 2),
     COLUMN_STRING_003(SQLiteConfig.TYPE_STRING + 3),

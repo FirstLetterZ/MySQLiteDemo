@@ -191,7 +191,7 @@ interface SqlExecutor {
                             bodyIndex = index
                         }
                     }
-                    is Havinng -> {
+                    is Having -> {
                         if (sqlMethodType is QUERY && groupInfo != null) {
                             type = checkSqlMethodType(it, type)
                             groupInfo?.having?.let { group ->

@@ -11,7 +11,6 @@ public class SQLiteConfig {
     public static final String TB_CACHE = "userCache";
     public static final String PRIMARY_KEY = "_id"; //主键
     public static final String FIRST_KEY_WORD = "keyword"; //表名
-    public static final String OTHER = "other"; //预留列
     public static final String TIME_CREATE = "create_time"; //数据插入时间--long类型
     public static final String TIME_UPDATE = "update_time"; //数据更新时间--long类型
     public static final String COLUMN_NAME = "column";
@@ -27,6 +26,7 @@ public class SQLiteConfig {
     public static final int DEF_NUMBER = 0;
     public static final boolean DEF_BOOLEAN = false;
     public static final String DEF_STRING = "";
+    public static final String DEF_NULL = "NULL";
 
     public static final String COMMA = " , ";
     public static final String ORDER = " ORDER BY ";

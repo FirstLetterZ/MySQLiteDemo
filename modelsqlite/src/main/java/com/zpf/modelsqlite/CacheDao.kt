@@ -77,18 +77,27 @@ class CacheDao : ISqlDao {
                 Logger.w("未找到数据对应的表格信息：" + value.javaClass.name)
             } else {
                 initChangeValueList(value, insertInfo.changeValueList)
-                insertValue(insertInfo)
-                result = 0
+                result = if (insertValue(insertInfo)) {
+                    0
+                } else {
+                    -1
+                }
             }
         } else {
             initChangeValueList(value, whereClause.changeValueList)
             val cursor = queryCursor(whereClause)
             result = if (cursor.moveToFirst()) {
-                updateValue(whereClause)
-                1
+                if (updateValue(whereClause)) {
+                    1
+                } else {
+                    -1
+                }
             } else {
-                insertValue(whereClause)
-                0
+                if (insertValue(whereClause)) {
+                    0
+                } else {
+                    -1
+                }
             }
         }
         return result
@@ -274,19 +283,8 @@ class CacheDao : ISqlDao {
                                         f.isAccessible = true
                                         val value = f[obj]
                                         changeValueList.add(
-                                            SqlColumnInfo(
-                                                relevance.saveColumn,
-                                                value
-                                            )
+                                            SqlColumnInfo(relevance.saveColumn, value)
                                         )
-                                        val sqLiteInfo = SQLiteInfo(classify.tableName)
-                                        sqLiteInfo.queryInfoList.add(
-                                            SqlColumnInfo(
-                                                relevance.targetColumn,
-                                                value
-                                            )
-                                        )
-                                        saveValue(obj, sqLiteInfo)
                                     }
                                 } catch (e: IllegalAccessException) {
                                     Logger.w("fail on step initChangeValueList : init @SQLiteRelevance fail & ${e.message}")
@@ -296,7 +294,6 @@ class CacheDao : ISqlDao {
                                 }
                                 break
                             }
-
                         }
                     } else {
                         Logger.w("fail on step initChangeValueList : @SQLiteRelevance class lack @SQLiteClassify")
@@ -316,9 +313,7 @@ class CacheDao : ISqlDao {
                 try {
                     field.isAccessible = true
                     val value = getValueByCursor(cursor, note.column)
-                    if (value != null && value is String
-                        && field.type != String::class.java
-                    ) {
+                    if (value != null && value is String && field.type != String::class.java) {
                         val newValue: Any? = SqlJsonUtilImpl.fromJson(value.toString(), field.type)
                         field[receiver] = newValue
                     } else {

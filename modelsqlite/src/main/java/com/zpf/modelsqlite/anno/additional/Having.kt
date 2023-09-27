@@ -9,7 +9,7 @@ import com.zpf.modelsqlite.constant.SQLiteRelation
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Havinng(
+annotation class Having(
         val column: ColumnEnum,
         val relation: SQLiteRelation = SQLiteRelation.RELATION_EQUALITY,
         val sqlFunc: String = "",
